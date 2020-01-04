@@ -2,40 +2,30 @@ import os
 import sys
 import pygame
 from Button import Button
+from AnimatedSprite import AnimatedSprite
+from Hero import Player
+from load_image import load_image
 
 pygame.init()
-FPS = 50
+FPS = 20
 WIDTH = 1080
 HEIGHT = 600
-step = 10
-INTRO_TEXT = ["Играть", "Правила", "Настройки"]
-
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
 player = None
 all_sprites = pygame.sprite.Group()
+tiles_group = pygame.sprite.Group()
+
+LEVELS = ["level1.txt",
+          "level2.txt",
+          "level3.txt",
+          "level4.txt",
+          "level5.txt"]
 
 
 def terminate():
     pygame.quit()
     sys.exit()
-
-
-def load_image(name, color_key=None):
-    fullname = os.path.join('data', name)
-    try:
-        image = pygame.image.load(fullname).convert()
-    except pygame.error as message:
-        print("Cannot load image:", name)
-        raise SystemExit(message)
-
-    if color_key is not None:
-        if color_key == -1:
-            color_key = image.get_at((0, 0))
-        image.set_colorkey(color_key)
-    else:
-        image = image.convert_alpha()
-    return image
 
 
 def load_level(filename):
@@ -129,11 +119,28 @@ def rule_screen():
         clock.tick(FPS)
 
 
+def play():
+    screen.fill((0, 0, 0))
+    hero = Player()
+    all_sprites.add(hero)
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                pass
+        screen.fill((0, 0, 0))
+        all_sprites.update()
+        all_sprites.draw(screen)
+        pygame.display.flip()
+        clock.tick(FPS)
+
+
+
+
 if __name__ == '__main__':
     pygame.mixer.music.load('.\data\Crystals.mp3')
     pygame.mixer.music.play(loops=-1)
     start_screen()
     pygame.mixer.music.stop()
-    pygame.mixer.music.load('.\data\Paris.mp3')
-    pygame.mixer.music.play(loops=-1)
-    # play_screen()
+    play()
