@@ -7,7 +7,7 @@ from Hero import Player
 from load_image import load_image
 
 pygame.init()
-FPS = 20
+FPS = 100
 WIDTH = 1080
 HEIGHT = 600
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -114,7 +114,7 @@ def rule_screen():
                 terminate()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if back_btn.pressed(event.pos):
-                    start_screen()
+                    return
         pygame.display.flip()
         clock.tick(FPS)
 
@@ -129,13 +129,26 @@ def play():
                 terminate()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 pass
-        screen.fill((0, 0, 0))
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_w or\
+                        event.key == pygame.K_a or\
+                        event.key == pygame.K_s or\
+                        event.key == pygame.K_d:
+                    hero.moving = True
+                    hero.motions.append(event.key)
+                    print(event.key)
+            elif event.type == pygame.KEYUP:
+                if event.key in hero.motions:
+                    del hero.motions[hero.motions.index(event.key)]
+                    if len(hero.motions) == 0:
+                        hero.moving = False
+                        hero.cur_frame = 0
+
         all_sprites.update()
+        screen.fill((0, 0, 0))
         all_sprites.draw(screen)
         pygame.display.flip()
-        clock.tick(FPS)
-
-
+        clock.tick(10)
 
 
 if __name__ == '__main__':
