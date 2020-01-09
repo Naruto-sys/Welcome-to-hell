@@ -2,14 +2,14 @@ import os
 import sys
 import pygame
 from Button import Button
-from AnimatedSprite import AnimatedSprite
 from Hero import Player
 from load_image import load_image
+from Camera import Camera
 
 pygame.init()
 FPS = 100
-WIDTH = 1080
-HEIGHT = 600
+WIDTH = 1200
+HEIGHT = 650
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
 player = None
@@ -122,28 +122,33 @@ def rule_screen():
 def play():
     screen.fill((0, 0, 0))
     hero = Player()
+    camera = Camera(WIDTH, HEIGHT)
     all_sprites.add(hero)
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                pass
+                if event.button == 1:
+                    pass
+                if event.button == 3:
+                    pass
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_w or\
-                        event.key == pygame.K_a or\
-                        event.key == pygame.K_s or\
+                if event.key == pygame.K_w or \
+                        event.key == pygame.K_a or \
+                        event.key == pygame.K_s or \
                         event.key == pygame.K_d:
                     hero.moving = True
                     hero.motions.append(event.key)
-                    print(event.key)
             elif event.type == pygame.KEYUP:
                 if event.key in hero.motions:
                     del hero.motions[hero.motions.index(event.key)]
                     if len(hero.motions) == 0:
                         hero.moving = False
                         hero.cur_frame = 0
-
+        camera.update(hero)
+        for sprite in all_sprites:
+            camera.apply(sprite)
         all_sprites.update()
         screen.fill((0, 0, 0))
         all_sprites.draw(screen)
@@ -155,5 +160,6 @@ if __name__ == '__main__':
     pygame.mixer.music.load('.\data\Crystals.mp3')
     pygame.mixer.music.play(loops=-1)
     start_screen()
-    pygame.mixer.music.stop()
+    pygame.mixer.music.load(".\data\Paris.mp3")
+    pygame.mixer.music.play(loops=-1)
     play()

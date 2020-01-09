@@ -3,6 +3,9 @@ from load_image import load_image
 import math
 
 
+clock = pygame.time.Clock()
+
+
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
@@ -21,7 +24,7 @@ class Player(pygame.sprite.Sprite):
         self.rect.x = 0
         self.rect.y = 0
 
-    def update(self, *args):
+    def update(self):
         if self.moving:
             self.cur_frame = (self.cur_frame + 1) % len(self.frames)
             self.image = self.frames[self.cur_frame]
@@ -32,10 +35,10 @@ class Player(pygame.sprite.Sprite):
         for elem in self.motions:
             if elem == 119:
                 self.rect.y -= self.step
-            if elem == 115:
+            elif elem == 115:
                 self.rect.y += self.step
-            if elem == 97:
+            elif elem == 97:
                 self.rect.x -= self.step
-            if elem == 100:
+            elif elem == 100:
                 self.rect.x += self.step
-
+        clock.tick(10)
