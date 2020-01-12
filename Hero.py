@@ -7,7 +7,7 @@ clock = pygame.time.Clock()
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, impassable_tiles_group):
         super().__init__()
         self.step = 10
         self.frames = [load_image("./mainHero/straight.jpg", color_key=-1),
@@ -21,7 +21,7 @@ class Player(pygame.sprite.Sprite):
         self.cur_frame = 0
         self.image = self.frames[self.cur_frame]
         self.mask = pygame.mask.from_surface(self.image)
-
+        self.impassable_tiles_group = impassable_tiles_group
         self.moving = False
         self.motions = []
         self.rect = self.image.get_rect()
@@ -36,13 +36,14 @@ class Player(pygame.sprite.Sprite):
         rel_x, rel_y = mouse_x - self.rect.x, mouse_y - self.rect.y
         angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
         self.image = pygame.transform.rotate(self.frames[self.cur_frame], int(angle))
-        for elem in self.motions:
-            if elem == 119:
-                self.rect.y -= self.step
-            elif elem == 115:
-                self.rect.y += self.step
-            elif elem == 97:
-                self.rect.x -= self.step
-            elif elem == 100:
-                self.rect.x += self.step
+        if not pygame.sprite.collide_mask(self, self.impassable_tiles_group):
+            for elem in self.motions:
+                if elem == 119:
+                    self.rect.y -= self.step
+                elif elem == 115:
+                    self.rect.y += self.step
+                elif elem == 97:
+                    self.rect.x -= self.step
+                elif elem == 100:
+                    self.rect.x += self.step
         clock.tick(10)
