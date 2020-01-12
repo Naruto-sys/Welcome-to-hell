@@ -14,6 +14,7 @@ HEIGHT = 650
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
 clock = pygame.time.Clock()
+
 player = None
 all_sprites = pygame.sprite.Group()
 tiles_group = pygame.sprite.Group()
@@ -70,27 +71,31 @@ def start_screen():
     fon2 = pygame.transform.scale(load_image('fon2.jpg'), (WIDTH, HEIGHT))
     fon_x1 = 0
     fon_x2 = fon.get_width()
+
     while True:
         clock.tick(100)
+
         fon_x1 -= 1.4
         fon_x2 -= 1.4
         if fon_x1 < fon.get_width() * -1:
             fon_x1 = fon.get_width()
-
         if fon_x2 < fon.get_width() * -1:
             fon_x2 = fon.get_width()
-
         screen.blit(fon, (fon_x1, 0))
         screen.blit(fon2, (fon_x2, 0))
+
         play_btn = Button()
         play_btn.create_button(screen, (10, 10, 10), WIDTH // 2 - 100, HEIGHT // 2 - 75, 200, 50, 1, "Play",
                                (255, 0, 0))
+
         rules_btn = Button()
         rules_btn.create_button(screen, (10, 10, 10), WIDTH // 2 - 100, HEIGHT // 2, 200, 50, 1, "Rules",
                                 (255, 0, 0))
+
         exit_btn = Button()
         exit_btn.create_button(screen, (10, 10, 10), WIDTH // 2 - 100, HEIGHT // 2 + 75, 200, 50, 1, "Exit",
                                (255, 0, 0))
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
@@ -113,10 +118,13 @@ def rule_screen():
              "S - Назад",
              "D - Вправо",
              "E - Взаимодейтсвовать"]
+
     fon = pygame.transform.scale(load_image('rule_fon.jpg'), (WIDTH, HEIGHT))
     screen.blit(fon, (0, 0))
+
     back_btn = Button()
     back_btn.create_button(screen, (10, 10, 10), WIDTH // 12, HEIGHT // 2 - 50, 200, 50, 1, "Back", (255, 0, 0))
+
     font = pygame.font.Font(None, 30)
     text_coord = HEIGHT // 2
     for line in rules:
@@ -127,6 +135,7 @@ def rule_screen():
         intro_rect.x = WIDTH // 12
         text_coord += intro_rect.height
         screen.blit(string_rendered, intro_rect)
+
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -134,16 +143,51 @@ def rule_screen():
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if back_btn.pressed(event.pos):
                     return
+
+        pygame.display.flip()
+        clock.tick(FPS)
+
+
+def pause():
+    flag = True
+    while flag:
+        screen.fill((0, 0, 0))
+        fon = pygame.transform.scale(load_image('hell.jpg'), (WIDTH, HEIGHT))
+        screen.blit(fon, (0, 0))
+
+        back_btn = Button()
+        back_btn.create_button(screen, (10, 10, 10), WIDTH // 3, HEIGHT // 4 - 50, 200, 50, 1, "Resume", (255, 0, 0))
+
+        menu_btn = Button()
+        menu_btn.create_button(screen, (10, 10, 10), WIDTH // 3, HEIGHT // 4 * 2 - 50, 200, 50, 1, "Menu", (255, 0, 0))
+
+        exit_btn = Button()
+        exit_btn.create_button(screen, (10, 10, 10), WIDTH // 3, HEIGHT // 4 * 3 - 50, 200, 50, 1, "Exit", (255, 0, 0))
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if back_btn.pressed(event.pos):
+                    return
+                elif menu_btn.pressed(event.pos):
+                    start_screen()
+                    flag = False
+                elif exit_btn.pressed(event.pos):
+                    terminate()
+
         pygame.display.flip()
         clock.tick(FPS)
 
 
 def play():
     screen.fill((0, 0, 0))
+
     hero = Player(impassable_tiles_group)
     camera = Camera(WIDTH, HEIGHT, x=hero.rect.x, y=hero.rect.y)
     generate_level(load_level("./levels/level1.txt"))
     all_sprites.add(hero)
+
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -160,12 +204,15 @@ def play():
                         event.key == pygame.K_d:
                     hero.moving = True
                     hero.motions.append(event.key)
+
             elif event.type == pygame.KEYUP:
                 if event.key in hero.motions:
                     del hero.motions[hero.motions.index(event.key)]
                     if len(hero.motions) == 0:
                         hero.moving = False
                         hero.cur_frame = 0
+                if event.key == pygame.K_ESCAPE:
+                    pause()
         camera.update(hero)
         for sprite in all_sprites:
             camera.apply(sprite)
