@@ -11,9 +11,13 @@ class Player(pygame.sprite.Sprite):
         super().__init__()
         self.step = 10
         self.frames = [load_image("./mainHero/straight.jpg", color_key=-1),
-                       load_image("./mainHero/right.jpg", color_key=-1),
+                       load_image("./mainHero/right_3.jpg", color_key=-1),
+                       load_image("./mainHero/right_2.jpg", color_key=-1),
+                       load_image("./mainHero/right_1.jpg", color_key=-1),
                        load_image("./mainHero/straight.jpg", color_key=-1),
-                       load_image("./mainHero/left.jpg", color_key=-1)]
+                       load_image("./mainHero/left_3.jpg", color_key=-1),
+                       load_image("./mainHero/left_2.jpg", color_key=-1),
+                       load_image("./mainHero/left_1.jpg", color_key=-1)]
         self.cur_frame = 0
         self.image = self.frames[self.cur_frame]
         self.mask = pygame.mask.from_surface(self.image)
