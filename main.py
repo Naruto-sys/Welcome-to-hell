@@ -4,14 +4,14 @@ import pygame
 from Button import Button
 from Hero import Player
 from load_image import load_image
-from Camera import Camera
 from tiles import Tile
+from Camera import Camera
 
 pygame.init()
 FPS = 100
 WIDTH = 1200
 HEIGHT = 650
-screen = pygame.display.set_mode((WIDTH, HEIGHT), resolution=(0,0), flags=0, depth=0)
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
 
 clock = pygame.time.Clock()
 player = None
@@ -43,11 +43,24 @@ def load_level(filename):
     return list(map(lambda x: x.ljust(max_width, '.'), level_map))
 
 
+tile_images = {"#": load_image("./tiles/grey_floor.jpg"),
+               "&": load_image("./tiles/light_grey_floor.jpg"),
+               "$": load_image("./tiles/warning_floor.jpg"),
+               "~": load_image("./tiles/lava.jpg"),
+               "|": load_image("./tiles/grey_rock_wall.jpg"),
+               "\\": load_image("./tiles/brown_rock_wall.jpg"),
+               "/": load_image("./tiles/brown_sugar_rock_wall.jpg")}
+
+
 def generate_level(level):
     new_player, x, y = None, None, None
     for y in range(len(level)):
         for x in range(len(level[y])):
-            Tile(level[y][x], x, y, impassable_tiles_group, tiles_group)
+            if level[y][x] in "\\|/":
+                Tile(tile_images[level[y][x]], x, y, impassable_tiles_group, tiles_group, all_sprites)
+            else:
+                Tile(tile_images[level[y][x]], x, y, tiles_group, all_sprites)
+
     return new_player, x, y
 
 
@@ -128,8 +141,8 @@ def rule_screen():
 def play():
     screen.fill((0, 0, 0))
     hero = Player(impassable_tiles_group)
+    camera = Camera(WIDTH, HEIGHT, x=hero.rect.x, y=hero.rect.y)
     generate_level(load_level("./levels/level1.txt"))
-    camera = Camera(WIDTH, HEIGHT)
     all_sprites.add(hero)
     while True:
         for event in pygame.event.get():
@@ -158,6 +171,7 @@ def play():
             camera.apply(sprite)
         all_sprites.update()
         screen.fill((0, 0, 0))
+        tiles_group.draw(screen)
         all_sprites.draw(screen)
         pygame.display.flip()
         clock.tick(10)

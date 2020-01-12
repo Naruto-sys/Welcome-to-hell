@@ -25,8 +25,8 @@ class Player(pygame.sprite.Sprite):
         self.moving = False
         self.motions = []
         self.rect = self.image.get_rect()
-        self.rect.x = 0
-        self.rect.y = 0
+        self.rect.x = 100
+        self.rect.y = 100
 
     def update(self):
         if self.moving:
@@ -36,14 +36,25 @@ class Player(pygame.sprite.Sprite):
         rel_x, rel_y = mouse_x - self.rect.x, mouse_y - self.rect.y
         angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
         self.image = pygame.transform.rotate(self.frames[self.cur_frame], int(angle))
-        if not pygame.sprite.collide_mask(self, self.impassable_tiles_group):
-            for elem in self.motions:
-                if elem == 119:
-                    self.rect.y -= self.step
-                elif elem == 115:
-                    self.rect.y += self.step
-                elif elem == 97:
-                    self.rect.x -= self.step
-                elif elem == 100:
-                    self.rect.x += self.step
+        for elem in self.motions:
+            if elem == 119:
+                self.rect.y -= self.step
+                for elem in self.impassable_tiles_group:
+                    if pygame.sprite.collide_mask(self, elem):
+                        self.rect.y += self.step
+            elif elem == 115:
+                self.rect.y += self.step
+                for elem in self.impassable_tiles_group:
+                    if pygame.sprite.collide_mask(self, elem):
+                        self.rect.y -= self.step
+            elif elem == 97:
+                self.rect.x -= self.step
+                for elem in self.impassable_tiles_group:
+                    if pygame.sprite.collide_mask(self, elem):
+                        self.rect.x += self.step
+            elif elem == 100:
+                self.rect.x += self.step
+                for elem in self.impassable_tiles_group:
+                    if pygame.sprite.collide_mask(self, elem):
+                        self.rect.x -= self.step
         clock.tick(10)
