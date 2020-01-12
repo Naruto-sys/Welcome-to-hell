@@ -66,6 +66,9 @@ def generate_level(level):
 
 
 def start_screen():
+    pygame.mixer.music.load('.\data\Crystals.mp3')
+    pygame.mixer.music.play(loops=-1)
+    pygame.mixer.music.set_volume(0.9)
     screen.fill((0, 0, 0))
     fon = pygame.transform.scale(load_image('fon.jpeg'), (WIDTH, HEIGHT))
     fon2 = pygame.transform.scale(load_image('fon2.jpg'), (WIDTH, HEIGHT))
@@ -148,41 +151,12 @@ def rule_screen():
         clock.tick(FPS)
 
 
-def pause():
-    flag = True
-    while flag:
-        screen.fill((0, 0, 0))
-        fon = pygame.transform.scale(load_image('hell.jpg'), (WIDTH, HEIGHT))
-        screen.blit(fon, (0, 0))
-
-        back_btn = Button()
-        back_btn.create_button(screen, (10, 10, 10), WIDTH // 3, HEIGHT // 4 - 50, 200, 50, 1, "Resume", (255, 0, 0))
-
-        menu_btn = Button()
-        menu_btn.create_button(screen, (10, 10, 10), WIDTH // 3, HEIGHT // 4 * 2 - 50, 200, 50, 1, "Menu", (255, 0, 0))
-
-        exit_btn = Button()
-        exit_btn.create_button(screen, (10, 10, 10), WIDTH // 3, HEIGHT // 4 * 3 - 50, 200, 50, 1, "Exit", (255, 0, 0))
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                terminate()
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                if back_btn.pressed(event.pos):
-                    return
-                elif menu_btn.pressed(event.pos):
-                    start_screen()
-                    flag = False
-                elif exit_btn.pressed(event.pos):
-                    terminate()
-
-        pygame.display.flip()
-        clock.tick(FPS)
-
-
 def play():
     screen.fill((0, 0, 0))
 
+    pygame.mixer.music.load(".\data\Paris.mp3")
+    pygame.mixer.music.play(loops=-1)
+    pygame.mixer.music.set_volume(0.9)
     hero = Player(impassable_tiles_group)
     camera = Camera(WIDTH, HEIGHT, x=hero.rect.x, y=hero.rect.y)
     generate_level(load_level("./levels/level1.txt"))
@@ -204,7 +178,6 @@ def play():
                         event.key == pygame.K_d:
                     hero.moving = True
                     hero.motions.append(event.key)
-
             elif event.type == pygame.KEYUP:
                 if event.key in hero.motions:
                     del hero.motions[hero.motions.index(event.key)]
@@ -212,7 +185,13 @@ def play():
                         hero.moving = False
                         hero.cur_frame = 0
                 if event.key == pygame.K_ESCAPE:
-                    pause()
+                    flag = pause()
+                    if flag == 1:
+                        for elem in all_sprites:
+                            elem.kill()
+                        return
+                    else:
+                        pygame.mixer.music.set_volume(0.9)
         camera.update(hero)
         for sprite in all_sprites:
             camera.apply(sprite)
@@ -224,10 +203,39 @@ def play():
         clock.tick(10)
 
 
+def pause():
+    pygame.mixer.music.set_volume(0.2)
+    running = True
+    while running:
+        screen.fill((0, 0, 0))
+        fon = pygame.transform.scale(load_image('hell.jpg'), (WIDTH, HEIGHT))
+        screen.blit(fon, (0, 0))
+
+        back_btn = Button()
+        back_btn.create_button(screen, (10, 10, 10), WIDTH // 3, HEIGHT // 4 - 50, 200, 50, 1, "Resume", (255, 0, 0))
+
+        menu_btn = Button()
+        menu_btn.create_button(screen, (10, 10, 10), WIDTH // 3, HEIGHT // 4 * 2 - 50, 200, 50, 1, "Menu", (255, 0, 0))
+
+        exit_btn = Button()
+        exit_btn.create_button(screen, (10, 10, 10), WIDTH // 3, HEIGHT // 4 * 3 - 50, 200, 50, 1, "Exit", (255, 0, 0))
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if back_btn.pressed(event.pos):
+                    return
+                elif menu_btn.pressed(event.pos):
+                    return 1
+                elif exit_btn.pressed(event.pos):
+                    terminate()
+
+        pygame.display.flip()
+        clock.tick(FPS)
+
+
 if __name__ == '__main__':
-    pygame.mixer.music.load('.\data\Crystals.mp3')
-    pygame.mixer.music.play(loops=-1)
-    start_screen()
-    pygame.mixer.music.load(".\data\Paris.mp3")
-    pygame.mixer.music.play(loops=-1)
-    play()
+    while True:
+        start_screen()
+        play()
