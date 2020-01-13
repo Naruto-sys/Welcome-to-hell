@@ -178,13 +178,10 @@ def play():
                         event.key == pygame.K_d:
                     hero.moving = True
                     hero.motions.append(event.key)
-            elif event.type == pygame.KEYUP:
-                if event.key in hero.motions:
-                    del hero.motions[hero.motions.index(event.key)]
-                    if len(hero.motions) == 0:
-                        hero.moving = False
-                        hero.cur_frame = 0
                 if event.key == pygame.K_ESCAPE:
+                    hero.motions = []
+                    hero.moving = False
+                    hero.cur_frame = 0
                     flag = pause()
                     if flag == 1:
                         for elem in all_sprites:
@@ -192,6 +189,12 @@ def play():
                         return
                     else:
                         pygame.mixer.music.set_volume(0.9)
+            elif event.type == pygame.KEYUP:
+                if event.key in hero.motions:
+                    del hero.motions[hero.motions.index(event.key)]
+                    if len(hero.motions) == 0:
+                        hero.moving = False
+                        hero.cur_frame = 0
         camera.update(hero)
         for sprite in all_sprites:
             camera.apply(sprite)
@@ -227,9 +230,48 @@ def pause():
                 if back_btn.pressed(event.pos):
                     return
                 elif menu_btn.pressed(event.pos):
-                    return 1
+                    anchor = warning_screen()
+                    if anchor == 1:
+                        return 1
+                    else:
+                        pygame.mixer.music.set_volume(0.2)
                 elif exit_btn.pressed(event.pos):
                     terminate()
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    return
+
+        pygame.display.flip()
+        clock.tick(FPS)
+
+
+def warning_screen():
+    pygame.mixer.music.set_volume(0)
+    running = True
+    while running:
+        fon = pygame.transform.scale(load_image('warning_picture.png'), (WIDTH, HEIGHT))
+        screen.blit(fon, (0, 0))
+
+        font = pygame.font.SysFont('Calibri', 72)
+        text = font.render("Are you sure you want to get out?", 0, (255, 255, 10))
+        screen.blit(text, (WIDTH // 10, HEIGHT // 4))
+
+        back_btn = Button()
+        back_btn.create_button(screen, (10, 10, 10), WIDTH // 4, HEIGHT // 2 + 150, 200, 75, 1, "BACK", (255, 0, 0))
+        exit_btn = Button()
+        exit_btn.create_button(screen, (10, 10, 10), WIDTH // 2, HEIGHT // 2 + 150, 200, 75, 1, "EXIT", (255, 0, 0))
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if back_btn.pressed(event.pos):
+                    return
+                elif exit_btn.pressed(event.pos):
+                    return 1
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    return
 
         pygame.display.flip()
         clock.tick(FPS)
