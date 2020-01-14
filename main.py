@@ -158,8 +158,9 @@ def play():
     pygame.mixer.music.play(loops=-1)
     pygame.mixer.music.set_volume(0.9)
     hero = Player(impassable_tiles_group)
-    camera = Camera(WIDTH, HEIGHT, x=hero.rect.x, y=hero.rect.y)
-    generate_level(load_level("./levels/level1.txt"))
+    a = load_level("./levels/level1.txt")
+    camera = Camera(WIDTH, HEIGHT, screen, all_sprites)
+    generate_level(a)
     all_sprites.add(hero)
 
     while True:
