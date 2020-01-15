@@ -1,7 +1,7 @@
 import pygame
+from rotate import rotate
 from load_image import load_image
 import math
-
 
 clock = pygame.time.Clock()
 
@@ -32,10 +32,12 @@ class Player(pygame.sprite.Sprite):
         if self.moving:
             self.cur_frame = (self.cur_frame + 1) % len(self.frames)
             self.image = self.frames[self.cur_frame]
+
         mouse_x, mouse_y = pygame.mouse.get_pos()
         rel_x, rel_y = mouse_x - self.rect.x, mouse_y - self.rect.y
         angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
-        self.image = pygame.transform.rotate(self.frames[self.cur_frame], int(angle))
+        self.image, self.rect = rotate(self.frames[self.cur_frame], self.rect, int(angle))
+
         for elem in self.motions:
             if elem == 119:
                 self.rect.y -= self.step
