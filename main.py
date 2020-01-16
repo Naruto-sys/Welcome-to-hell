@@ -170,7 +170,9 @@ def play():
                 terminate()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
-                    all_sprites.add(Bullet(load_image("bullet.png", -1), 10, 20, (hero.rect.x, hero.rect.y), event.pos, 600))
+                    all_sprites.add(Bullet(load_image("bullet.png", -1), 10,
+                                    20, (hero.rect.x + hero.rect.w // 2, hero.rect.y + hero.rect.h // 2),
+                                    (event.pos), 600, impassable_tiles_group))
                 if event.button == 3:
                     pass
             elif event.type == pygame.KEYDOWN:
@@ -205,7 +207,7 @@ def play():
         tiles_group.draw(screen)
         all_sprites.draw(screen)
         pygame.display.flip()
-        clock.tick(10)
+        clock.tick(20)
 
 
 def pause():

@@ -44,19 +44,23 @@ class Player(pygame.sprite.Sprite):
                 for elem in self.impassable_tiles_group:
                     if pygame.sprite.collide_mask(self, elem):
                         self.rect.y += self.step
+                        break
             elif elem == 115:
                 self.rect.y += self.step
                 for elem in self.impassable_tiles_group:
                     if pygame.sprite.collide_mask(self, elem):
                         self.rect.y -= self.step
+                        break
             elif elem == 97:
                 self.rect.x -= self.step
                 for elem in self.impassable_tiles_group:
                     if pygame.sprite.collide_mask(self, elem):
                         self.rect.x += self.step
+                        break
             elif elem == 100:
                 self.rect.x += self.step
                 for elem in self.impassable_tiles_group:
                     if pygame.sprite.collide_mask(self, elem):
                         self.rect.x -= self.step
+                        break
         clock.tick(10)
