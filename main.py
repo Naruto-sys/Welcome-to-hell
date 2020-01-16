@@ -1,6 +1,7 @@
 import os
 import sys
 import pygame
+import random
 from Button import Button
 from Hero import Player
 from load_image import load_image
@@ -67,26 +68,20 @@ def generate_level(level):
 
 
 def start_screen():
-    pygame.mixer.music.load('.\data\Crystals.mp3')
+    pygame.mixer.music.load('./data/Crystals.mp3')
     pygame.mixer.music.play(loops=-1)
     pygame.mixer.music.set_volume(0.9)
     screen.fill((0, 0, 0))
-    fon = pygame.transform.scale(load_image('fon.jpeg'), (WIDTH, HEIGHT))
-    fon2 = pygame.transform.scale(load_image('fon2.jpg'), (WIDTH, HEIGHT))
+    fon = pygame.transform.scale(load_image('fons/menu/fon.jpeg'), (WIDTH, HEIGHT))
     fon_x1 = 0
-    fon_x2 = fon.get_width()
+
+    fons = [fon, fon, fon, fon, fon]
+    fons.extend([pygame.transform.scale(load_image(f'fons/menu/fon{_}.jpg'), (WIDTH, HEIGHT)) for _ in range(2, 6)])
 
     while True:
         clock.tick(100)
 
-        fon_x1 -= 1.4
-        fon_x2 -= 1.4
-        if fon_x1 < fon.get_width() * -1:
-            fon_x1 = fon.get_width()
-        if fon_x2 < fon.get_width() * -1:
-            fon_x2 = fon.get_width()
-        screen.blit(fon, (fon_x1, 0))
-        screen.blit(fon2, (fon_x2, 0))
+        screen.blit(random.choice(fons), (fon_x1, 0))
 
         play_btn = Button()
         play_btn.create_button(screen, (10, 10, 10), WIDTH // 2 - 100, HEIGHT // 2 - 75, 200, 50, 1, "Play",
@@ -123,7 +118,7 @@ def rule_screen():
              "D - Вправо",
              "E - Взаимодейтсвовать"]
 
-    fon = pygame.transform.scale(load_image('rule_fon.jpg'), (WIDTH, HEIGHT))
+    fon = pygame.transform.scale(load_image('fons/rule_fon.jpg'), (WIDTH, HEIGHT))
     screen.blit(fon, (0, 0))
 
     back_btn = Button()
@@ -155,7 +150,7 @@ def rule_screen():
 def play():
     screen.fill((0, 0, 0))
 
-    pygame.mixer.music.load(".\data\Paris.mp3")
+    pygame.mixer.music.load("./data/Paris.mp3")
     pygame.mixer.music.play(loops=-1)
     pygame.mixer.music.set_volume(0.9)
     hero = Player(impassable_tiles_group)
@@ -172,7 +167,7 @@ def play():
                 if event.button == 1:
                     all_sprites.add(Bullet(load_image("bullet.png", -1), 10,
                                     20, (hero.rect.x + hero.rect.w // 2, hero.rect.y + hero.rect.h // 2),
-                                    (event.pos), 600, impassable_tiles_group))
+                                    event.pos, 600, impassable_tiles_group))
                 if event.button == 3:
                     pass
             elif event.type == pygame.KEYDOWN:
@@ -215,7 +210,7 @@ def pause():
     running = True
     while running:
         screen.fill((0, 0, 0))
-        fon = pygame.transform.scale(load_image('hell.jpg'), (WIDTH, HEIGHT))
+        fon = pygame.transform.scale(load_image('fons/hell.jpg'), (WIDTH, HEIGHT))
         screen.blit(fon, (0, 0))
 
         back_btn = Button()
@@ -253,7 +248,7 @@ def warning_screen():
     pygame.mixer.music.set_volume(0)
     running = True
     while running:
-        fon = pygame.transform.scale(load_image('warning_picture.png'), (WIDTH, HEIGHT))
+        fon = pygame.transform.scale(load_image('fons/warning_picture.png'), (WIDTH, HEIGHT))
         screen.blit(fon, (0, 0))
 
         font = pygame.font.SysFont('Calibri', 72)
