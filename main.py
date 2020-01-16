@@ -6,6 +6,7 @@ from Hero import Player
 from load_image import load_image
 from tiles import Tile
 from Camera import Camera
+from Bullet import Bullet
 
 pygame.init()
 FPS = 100
@@ -169,7 +170,7 @@ def play():
                 terminate()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
-                    pass
+                    all_sprites.add(Bullet(load_image("bullet.png", -1), 10, 20, (hero.rect.x, hero.rect.y), event.pos, 600))
                 if event.button == 3:
                     pass
             elif event.type == pygame.KEYDOWN:
