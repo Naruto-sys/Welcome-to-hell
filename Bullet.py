@@ -2,7 +2,8 @@ import pygame
 
 
 class Bullet(pygame.sprite.Sprite):
-    def __init__(self, image, damage, speed, start_pos, point_pos, distance, walls):
+    def __init__(self, image, damage, speed, start_pos, point_pos, distance,
+                 walls):
         super().__init__()
 
         self.image = image
@@ -24,16 +25,33 @@ class Bullet(pygame.sprite.Sprite):
         x1 = self.point_pos[0] - self.start_pos[0]
         y1 = self.point_pos[1] - self.start_pos[1]
 
-        while (x1 ** 2 + y1 ** 2) ** 0.5 < 600:
-            x1 += self.x / self.speed
-            y1 += self.y / self.speed
+        if (x1 ** 2 + y1 ** 2) ** 0.5 < self.distance:
+            while (x1 ** 2 + y1 ** 2) ** 0.5 < self.distance:
+                x1 += self.x / self.speed
+                y1 += self.y / self.speed
 
-        self.x = int(x1)
-        self.y = int(y1)
+            self.x = int(x1)
+            self.y = int(y1)
+
+        else:
+            while (x1 ** 2 + y1 ** 2) ** 0.5 < self.distance:
+                x1 += self.x / self.speed
+                y1 += self.y / self.speed
+
+            self.x = -int(x1)
+            self.y = -int(y1)
+
+        self.passed_distance = 0
 
     def update(self, *args):
         self.rect.x -= self.x // self.speed
         self.rect.y -= self.y // self.speed
+
+        self.passed_distance += ((self.x // self.speed) ** 2 +
+                                 (self.y // self.speed) ** 2) ** 0.5
+
+        if self.passed_distance > self.distance:
+            self.kill()
 
         if self.x < 0:
             if self.rect.x < self.x + self.start_pos[0]:
