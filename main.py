@@ -68,7 +68,7 @@ def generate_level(level):
 
 
 def start_screen():
-    pygame.mixer.music.load('./data/Crystals.mp3')
+    pygame.mixer.music.load('./data/sounds/Crystals.mp3')
     pygame.mixer.music.play(loops=-1)
     pygame.mixer.music.set_volume(0.9)
     screen.fill((0, 0, 0))
@@ -100,10 +100,12 @@ def start_screen():
                 terminate()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if rules_btn.pressed(event.pos):
+                    pygame.mixer.Sound('./data/sounds/Select.wav').play()
                     rule_screen()
                 if exit_btn.pressed(event.pos):
                     terminate()
                 if play_btn.pressed(event.pos):
+                    pygame.mixer.Sound('./data/sounds/Select.wav').play()
                     return
         pygame.display.flip()
         clock.tick(FPS)
@@ -141,6 +143,7 @@ def rule_screen():
                 terminate()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if back_btn.pressed(event.pos):
+                    pygame.mixer.Sound('./data/sounds/Select.wav').play()
                     return
 
         pygame.display.flip()
@@ -150,7 +153,7 @@ def rule_screen():
 def play():
     screen.fill((0, 0, 0))
 
-    pygame.mixer.music.load("./data/Paris.mp3")
+    pygame.mixer.music.load("./data/sounds/Paris.mp3")
     pygame.mixer.music.play(loops=-1)
     pygame.mixer.music.set_volume(0.9)
     hero = Player(impassable_tiles_group)
@@ -165,9 +168,10 @@ def play():
                 terminate()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
-                    all_sprites.add(Bullet(load_image("bullet.png", -1), 10,
+                    all_sprites.add(Bullet(load_image("./bullets/bullet.png", -1), 10,
                                     20, (hero.rect.x + hero.rect.w // 2, hero.rect.y + hero.rect.h // 2),
                                     event.pos, 600, impassable_tiles_group))
+                    pygame.mixer.Sound('./data/sounds/Shoot.wav').play()
                 if event.button == 3:
                     pass
             elif event.type == pygame.KEYDOWN:
@@ -227,8 +231,10 @@ def pause():
                 terminate()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if back_btn.pressed(event.pos):
+                    pygame.mixer.Sound('./data/sounds/Select.wav').play()
                     return
                 elif menu_btn.pressed(event.pos):
+                    pygame.mixer.Sound('./data/sounds/Select.wav').play()
                     anchor = warning_screen()
                     if anchor == 1:
                         return 1
@@ -265,8 +271,10 @@ def warning_screen():
                 terminate()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if back_btn.pressed(event.pos):
+                    pygame.mixer.Sound('./data/sounds/Select.wav').play()
                     return
                 elif exit_btn.pressed(event.pos):
+                    pygame.mixer.Sound('./data/sounds/Select.wav').play()
                     return 1
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
