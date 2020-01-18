@@ -28,8 +28,8 @@ class Player(pygame.sprite.Sprite):
         self.rect.x = 100
         self.rect.y = 100
 
-        self.hp = 100000
-
+        self.hp = 10000
+        self.kills = 0
         self.coins = 0
 
     def update(self):
