@@ -17,6 +17,8 @@ class Bullet(pygame.sprite.Sprite):
         self.speed = speed
         self.distance = distance
 
+        self.mask = pygame.mask.from_surface(self.image)
+
         self.start_pos = start_pos
         self.x = self.start_pos[0] - point_pos[0]
         self.y = self.start_pos[1] - point_pos[1]

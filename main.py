@@ -22,6 +22,7 @@ all_sprites = pygame.sprite.Group()
 tiles_group = pygame.sprite.Group()
 impassable_tiles_group = pygame.sprite.Group()
 warring_tiles_group = pygame.sprite.Group()
+lava_tiles_group = pygame.sprite.Group()
 
 LEVELS = ["level1.txt",
           "level2.txt",
@@ -65,6 +66,8 @@ def generate_level(level):
                 Tile(tile_images[level[y][x]], x, y, impassable_tiles_group, tiles_group, all_sprites)
             elif level[y][x] == '$':
                 Tile(tile_images[level[y][x]], x, y, warring_tiles_group, tiles_group, all_sprites)
+            elif level[y][x] == '~':
+                Tile(tile_images[level[y][x]], x, y, lava_tiles_group, tiles_group, all_sprites)
             else:
                 Tile(tile_images[level[y][x]], x, y, tiles_group, all_sprites)
     return new_player, x, y
@@ -222,6 +225,9 @@ def play_level():
             if pygame.sprite.spritecollideany(hero, warring_tiles_group) and level == 3:
                 congratulations_screen()
 
+            if pygame.sprite.spritecollideany(hero, lava_tiles_group):
+                hero.hp -= 1
+
             camera.update(hero)
             for sprite in all_sprites:
                 camera.apply(sprite)
@@ -229,6 +235,36 @@ def play_level():
             screen.fill((0, 0, 0))
             tiles_group.draw(screen)
             all_sprites.draw(screen)
+
+            hp = pygame.font.Font(None, 50)
+            text_hp = hp.render(f"HP: {hero.hp}", 1, (255, 255, 255))
+            text_hp_x = WIDTH // 13 * 11 - text_hp.get_width() // 2
+            text_hp_y = HEIGHT // 12 - text_hp.get_height() // 2
+            text_hp_w = text_hp.get_width()
+            text_hp_h = text_hp.get_height()
+            screen.blit(text_hp, (text_hp_x, text_hp_y))
+            pygame.draw.rect(screen, (255, 255, 255), (text_hp_x - 10, text_hp_y - 10,
+                                                       text_hp_w + 20, text_hp_h + 20), 3)
+
+            lvl = pygame.font.Font(None, 50)
+            text_lvl = lvl.render(f"Level: {level}", 1, (255, 255, 255))
+            text_lvl_x = WIDTH // 13 * 2 - text_lvl.get_width() // 2
+            text_lvl_y = HEIGHT // 12 - text_lvl.get_height() // 2
+            text_lvl_w = text_lvl.get_width()
+            text_lvl_h = text_lvl.get_height()
+            screen.blit(text_lvl, (text_lvl_x, text_lvl_y))
+            pygame.draw.rect(screen, (255, 255, 255), (text_lvl_x - 10, text_lvl_y - 10,
+                                                       text_lvl_w + 20, text_lvl_h + 20), 3)
+
+            coins = pygame.font.Font(None, 50)
+            text_coins = coins.render(f"Coins: {hero.coins}", 1, (255, 255, 255))
+            text_coins_x = WIDTH // 13 * 6.7 - text_coins.get_width() // 2
+            text_coins_y = HEIGHT // 12 - text_coins.get_height() // 2
+            text_coins_w = text_coins.get_width()
+            text_coins_h = text_coins.get_height()
+            screen.blit(text_coins, (text_coins_x, text_coins_y))
+            pygame.draw.rect(screen, (255, 255, 255), (text_coins_x - 10, text_coins_y - 10,
+                                                       text_coins_w + 20, text_coins_h + 20), 3)
 
             pygame.display.flip()
             clock.tick(20)
