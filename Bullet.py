@@ -7,7 +7,9 @@ class Bullet(pygame.sprite.Sprite):
         super().__init__()
 
         self.image = image
+        self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect()
+
         self.rect.x = start_pos[0]
         self.rect.y = start_pos[1]
 
@@ -37,7 +39,6 @@ class Bullet(pygame.sprite.Sprite):
             while (x1 ** 2 + y1 ** 2) ** 0.5 < self.distance:
                 x1 += self.x / self.speed
                 y1 += self.y / self.speed
-
             self.x = -int(x1)
             self.y = -int(y1)
 
@@ -46,13 +47,10 @@ class Bullet(pygame.sprite.Sprite):
     def update(self, *args):
         self.rect.x -= self.x // self.speed
         self.rect.y -= self.y // self.speed
-
         self.passed_distance += ((self.x // self.speed) ** 2 +
                                  (self.y // self.speed) ** 2) ** 0.5
-
         if self.passed_distance > self.distance:
             self.kill()
-
         if self.x < 0:
             if self.rect.x < self.x + self.start_pos[0]:
                 self.kill()

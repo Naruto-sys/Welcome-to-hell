@@ -8,6 +8,7 @@ from load_image import load_image
 from tiles import Tile
 from Camera import Camera
 from Bullet import Bullet
+from Turel import Turel
 
 pygame.init()
 FPS = 100
@@ -157,10 +158,12 @@ def play():
     pygame.mixer.music.play(loops=-1)
     pygame.mixer.music.set_volume(0.9)
     hero = Player(impassable_tiles_group)
+    enemy = Turel((450, 500), load_image("./turel.png", -1),
+                   impassable_tiles_group, hero, all_sprites)
     a = load_level("./levels/level1.txt")
     camera = Camera(WIDTH, HEIGHT, screen, all_sprites)
     generate_level(a)
-    all_sprites.add(hero)
+    all_sprites.add(hero, enemy)
 
     while True:
         for event in pygame.event.get():
@@ -195,9 +198,6 @@ def play():
             elif event.type == pygame.KEYUP:
                 if event.key in hero.motions:
                     del hero.motions[hero.motions.index(event.key)]
-                    if len(hero.motions) == 0:
-                        hero.moving = False
-                        hero.cur_frame = 0
         camera.update(hero)
         for sprite in all_sprites:
             camera.apply(sprite)
