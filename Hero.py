@@ -28,6 +28,10 @@ class Player(pygame.sprite.Sprite):
         self.rect.x = 100
         self.rect.y = 100
 
+        self.hp = 100000
+
+        self.coins = 0
+
     def update(self):
         if self.moving:
             self.cur_frame = (self.cur_frame + 1) % len(self.frames)
