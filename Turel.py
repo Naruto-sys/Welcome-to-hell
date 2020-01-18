@@ -1,11 +1,13 @@
 from Bullet import Bullet
 from load_image import load_image
+from coin import Coin
 from rotate import rotate
 import pygame, math
 
 
+
 class Turel(pygame.sprite.Sprite):
-    def __init__(self, start_pos, frame, walls, hero, all_sprites):
+    def __init__(self, start_pos, frame, walls, hero, all_sprites, bullets_group, enemies_group):
         super().__init__()
         self.all_sprites = all_sprites
         self.walls = walls
@@ -14,18 +16,20 @@ class Turel(pygame.sprite.Sprite):
         self.frame = frame
         self.image = frame
         self.mask = pygame.mask.from_surface(self.image)
+        self.enemies_group = enemies_group
 
         self.start_pos = start_pos
         self.rect = self.image.get_rect()
 
         self.rect.x = start_pos[0]
         self.rect.y = start_pos[1]
+        self.bullets_group = bullets_group
+
+        self.hp = 2000
 
     def shooting(self, hero, s_x, s_y):
         flag = True
         self.distance = ((hero.rect.x - s_x) ** 2 + (hero.rect.y - s_y) ** 2) ** 0.5
-        if self.distance > 400:
-            self.distance = 400
         self.x = self.start_pos[0] - hero.rect.x
         self.y = self.start_pos[1] - hero.rect.y
         x1 = self.hero.rect.x - self.start_pos[0]
@@ -78,7 +82,7 @@ class Turel(pygame.sprite.Sprite):
                     flag = False
                     break
             for elem in self.walls:
-                if pygame.sprite.collide_mask(self, elem):
+                if pygame.sprite.collide_mask(self, elem) and elem not in self.enemies_group:
                     flag = False
                     break
         self.rect.x = s_x
@@ -88,9 +92,14 @@ class Turel(pygame.sprite.Sprite):
                                         20, 20, (self.rect.x + self.rect.w // 2, self.rect.y + self.rect.h // 2),
                                         (self.hero.rect.x + self.hero.rect.w // 2,
                                          self.hero.rect.y + self.hero.rect.h // 2),
-                                        1000, self.walls))
+                                        1000, self.walls, self.hero, self.enemies_group))
 
     def update(self, *args):
+        if self.hp <= 0:
+            self.all_sprites.add(Coin((self.rect.x, self.rect.y), self.all_sprites, self.hero))
+            self.kill()
+            self.hero.kills += 1
+            return
         self.shooting(self.hero, self.rect.x, self.rect.y)
         mouse_x, mouse_y = self.hero.rect.x + self.hero.rect.w // 2, self.hero.rect.y + + self.hero.rect.h // 2
         rel_x, rel_y = mouse_x - self.rect.x, mouse_y - self.rect.y

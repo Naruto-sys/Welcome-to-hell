@@ -8,6 +8,7 @@ from load_image import load_image
 from tiles import Tile
 from Camera import Camera
 from Bullet import Bullet
+from Turel import Turel
 
 pygame.init()
 FPS = 100
@@ -23,6 +24,10 @@ tiles_group = pygame.sprite.Group()
 impassable_tiles_group = pygame.sprite.Group()
 warring_tiles_group = pygame.sprite.Group()
 lava_tiles_group = pygame.sprite.Group()
+enemies_tiles_group = pygame.sprite.Group()
+enemies_bullets_tiles_group = pygame.sprite.Group()
+heroes_tiles_group = pygame.sprite.Group()
+
 
 LEVELS = ["level1.txt",
           "level2.txt",
@@ -167,11 +172,14 @@ def play_level():
         pygame.mixer.music.set_volume(0.9)
 
         hero = Player(impassable_tiles_group)
+        enemy = Turel((400, 500), load_image("./turels/Turel.png", -1), impassable_tiles_group, hero, all_sprites, -1, enemies_tiles_group)
+        impassable_tiles_group.add(enemy)
+        enemies_tiles_group.add(enemy)
 
         a = load_level(f"./levels/level{level}.txt")
         camera = Camera(WIDTH, HEIGHT, screen, all_sprites)
         generate_level(a)
-        all_sprites.add(hero)
+        all_sprites.add(hero, enemy)
 
         while True:
             for event in pygame.event.get():
@@ -181,7 +189,7 @@ def play_level():
                     if event.button == 1:
                         all_sprites.add(Bullet(load_image("./bullets/bullet.png", -1), 10,
                                                20, (hero.rect.x + hero.rect.w // 2, hero.rect.y + hero.rect.h // 2),
-                                               event.pos, 600, impassable_tiles_group))
+                                               event.pos, 600, impassable_tiles_group, hero, enemies_tiles_group, enemies_tiles_group))
                         pygame.mixer.Sound('./data/sounds/Shoot.wav').play()
                     if event.button == 3:
                         pass
@@ -373,6 +381,7 @@ def start_new_level_screen():
                     pygame.mixer.Sound('./data/sounds/Select.wav').play()
                     return False
                 elif start_btn.pressed(event.pos):
+                    pygame.mixer.Sound('./data/sounds/Select.wav').play()
                     return True
 
             elif event.type == pygame.KEYDOWN:
