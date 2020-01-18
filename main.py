@@ -21,6 +21,7 @@ player = None
 all_sprites = pygame.sprite.Group()
 tiles_group = pygame.sprite.Group()
 impassable_tiles_group = pygame.sprite.Group()
+warring_tiles_group = pygame.sprite.Group()
 
 LEVELS = ["level1.txt",
           "level2.txt",
@@ -47,6 +48,7 @@ def load_level(filename):
 
 
 tile_images = {"#": load_image("./tiles/grey_floor.jpg"),
+               "*": load_image("./tiles/brown_floor.jpg"),
                "&": load_image("./tiles/light_grey_floor.jpg"),
                "$": load_image("./tiles/warning_floor.jpg"),
                "~": load_image("./tiles/lava.jpg"),
@@ -61,9 +63,10 @@ def generate_level(level):
         for x in range(len(level[y])):
             if level[y][x] in "\\|/":
                 Tile(tile_images[level[y][x]], x, y, impassable_tiles_group, tiles_group, all_sprites)
+            elif level[y][x] == '$':
+                Tile(tile_images[level[y][x]], x, y, warring_tiles_group, tiles_group, all_sprites)
             else:
                 Tile(tile_images[level[y][x]], x, y, tiles_group, all_sprites)
-
     return new_player, x, y
 
 
@@ -150,63 +153,89 @@ def rule_screen():
         clock.tick(FPS)
 
 
-def play():
-    screen.fill((0, 0, 0))
+def play_level():
+    win_flag = False
+    level = 1
+    while not win_flag:
+        screen.fill((0, 0, 0))
 
-    pygame.mixer.music.load("./data/sounds/Paris.mp3")
-    pygame.mixer.music.play(loops=-1)
-    pygame.mixer.music.set_volume(0.9)
-    hero = Player(impassable_tiles_group)
-    a = load_level("./levels/level1.txt")
-    camera = Camera(WIDTH, HEIGHT, screen, all_sprites)
-    generate_level(a)
-    all_sprites.add(hero)
+        pygame.mixer.music.load("./data/sounds/Paris.mp3")
+        pygame.mixer.music.play(loops=-1)
+        pygame.mixer.music.set_volume(0.9)
 
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                terminate()
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 1:
-                    all_sprites.add(Bullet(load_image("./bullets/bullet.png", -1), 10,
-                                    20, (hero.rect.x + hero.rect.w // 2, hero.rect.y + hero.rect.h // 2),
-                                    event.pos, 600, impassable_tiles_group))
-                    pygame.mixer.Sound('./data/sounds/Shoot.wav').play()
-                if event.button == 3:
-                    pass
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_w or \
-                        event.key == pygame.K_a or \
-                        event.key == pygame.K_s or \
-                        event.key == pygame.K_d:
-                    hero.moving = True
-                    hero.motions.append(event.key)
-                if event.key == pygame.K_ESCAPE:
-                    hero.motions = []
-                    hero.moving = False
-                    hero.cur_frame = 0
-                    flag = pause()
-                    if flag == 1:
-                        for elem in all_sprites:
-                            elem.kill()
-                        return
-                    else:
-                        pygame.mixer.music.set_volume(0.9)
-            elif event.type == pygame.KEYUP:
-                if event.key in hero.motions:
-                    del hero.motions[hero.motions.index(event.key)]
-                    if len(hero.motions) == 0:
+        hero = Player(impassable_tiles_group)
+
+        a = load_level(f"./levels/level{level}.txt")
+        camera = Camera(WIDTH, HEIGHT, screen, all_sprites)
+        generate_level(a)
+        all_sprites.add(hero)
+
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    terminate()
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.button == 1:
+                        all_sprites.add(Bullet(load_image("./bullets/bullet.png", -1), 10,
+                                               20, (hero.rect.x + hero.rect.w // 2, hero.rect.y + hero.rect.h // 2),
+                                               event.pos, 600, impassable_tiles_group))
+                        pygame.mixer.Sound('./data/sounds/Shoot.wav').play()
+                    if event.button == 3:
+                        pass
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_w or \
+                            event.key == pygame.K_a or \
+                            event.key == pygame.K_s or \
+                            event.key == pygame.K_d:
+                        hero.moving = True
+                        hero.motions.append(event.key)
+                    if event.key == pygame.K_ESCAPE:
+                        hero.motions = []
                         hero.moving = False
                         hero.cur_frame = 0
-        camera.update(hero)
-        for sprite in all_sprites:
-            camera.apply(sprite)
-        all_sprites.update()
-        screen.fill((0, 0, 0))
-        tiles_group.draw(screen)
-        all_sprites.draw(screen)
-        pygame.display.flip()
-        clock.tick(20)
+                        flag = pause()
+                        if flag == 1:
+                            for elem in all_sprites:
+                                elem.kill()
+                            return
+                        else:
+                            pygame.mixer.music.set_volume(0.9)
+                elif event.type == pygame.KEYUP:
+                    if event.key in hero.motions:
+                        del hero.motions[hero.motions.index(event.key)]
+                        if len(hero.motions) == 0:
+                            hero.moving = False
+                            hero.cur_frame = 0
+
+            if pygame.sprite.spritecollideany(hero, warring_tiles_group) and level != 3:
+                flag = start_new_level_screen()
+                if flag:
+                    for elem in all_sprites:
+                        elem.kill()
+                    level += 1
+                    break
+                else:
+                    hero.motions = []
+                    hero.moving = False
+                    hero.rect.y -= 150
+
+            if pygame.sprite.spritecollideany(hero, warring_tiles_group) and level == 3:
+                congratulations_screen()
+
+            camera.update(hero)
+            for sprite in all_sprites:
+                camera.apply(sprite)
+            all_sprites.update()
+            screen.fill((0, 0, 0))
+            tiles_group.draw(screen)
+            all_sprites.draw(screen)
+
+            pygame.display.flip()
+            clock.tick(20)
+
+
+def congratulations_screen():
+    print("Good job!")
 
 
 def pause():
@@ -284,7 +313,41 @@ def warning_screen():
         clock.tick(FPS)
 
 
+def start_new_level_screen():
+    pygame.mixer.music.set_volume(1)
+    running = True
+    while running:
+        fon = pygame.transform.scale(load_image('fons/warning_picture.png'), (WIDTH, HEIGHT))
+        screen.blit(fon, (0, 0))
+
+        font = pygame.font.SysFont('Calibri', 72)
+        text = font.render("Do you want to start new level?", 0, (255, 255, 10))
+        screen.blit(text, (WIDTH // 10, HEIGHT // 4))
+
+        back_btn = Button()
+        back_btn.create_button(screen, (10, 10, 10), WIDTH // 4, HEIGHT // 2 + 150, 200, 75, 1, "BACK", (255, 0, 0))
+        start_btn = Button()
+        start_btn.create_button(screen, (10, 10, 10), WIDTH // 2, HEIGHT // 2 + 150, 200, 75, 1, "START", (255, 0, 0))
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if back_btn.pressed(event.pos):
+                    pygame.mixer.Sound('./data/sounds/Select.wav').play()
+                    return False
+                elif start_btn.pressed(event.pos):
+                    return True
+
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    return
+
+        pygame.display.flip()
+        clock.tick(FPS)
+
+
 if __name__ == '__main__':
     while True:
         start_screen()
-        play()
+        play_level()
