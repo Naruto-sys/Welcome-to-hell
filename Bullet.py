@@ -2,6 +2,7 @@ import pygame
 
 
 class Bullet(pygame.sprite.Sprite):
+    """Класс пули"""
     def __init__(self, image, damage, speed, start_pos, final_pos,
                  distance, walls, hero, enemies, bull_group=-1):
         super().__init__()
@@ -24,6 +25,7 @@ class Bullet(pygame.sprite.Sprite):
 
         self.mask = pygame.mask.from_surface(self.image)
 
+        # рассчёт траектории полёта пули
         self.start_pos = start_pos
         self.x = self.start_pos[0] - final_pos[0]
         self.y = self.start_pos[1] - final_pos[1]
@@ -50,6 +52,7 @@ class Bullet(pygame.sprite.Sprite):
         self.passed_distance = 0
 
     def update(self, *args):
+        """Изменение положения пули при полёте"""
         self.rect.x -= self.x // self.speed
         self.rect.y -= self.y // self.speed
         self.passed_distance += ((self.x // self.speed) ** 2 +
@@ -57,6 +60,7 @@ class Bullet(pygame.sprite.Sprite):
         if self.passed_distance > self.distance:
             self.kill()
 
+        # проверка, вылетела ли пуля за грань экрана
         if self.x < 0:
             if self.rect.x < self.x + self.start_pos[0]:
                 self.kill()
@@ -65,6 +69,7 @@ class Bullet(pygame.sprite.Sprite):
             if self.rect.x > self.x + self.start_pos[0]:
                 self.kill()
 
+        # проверка, не столкнулась ли пуля с объектами
         if self.bull_group == -1:
             if pygame.sprite.collide_mask(self, self.hero):
                 pygame.mixer.Sound('./data/sounds/Hit.wav').play()

@@ -7,6 +7,7 @@ import math
 
 
 class Turel(pygame.sprite.Sprite):
+    """Класс врагов, турелей, стреляющих по игроку"""
     def __init__(self, pos_x, pos_y, frame, walls, hero, all_sprites, bullets_group, enemies_group):
         super().__init__()
         self.all_sprites = all_sprites

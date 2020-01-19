@@ -3,6 +3,7 @@ from load_image import load_image
 
 
 class Coin(pygame.sprite.Sprite):
+    """Монета - игровая валюта"""
     def __init__(self, pos_x, pos_y, hero):
         super().__init__()
         self.image = pygame.transform.scale(load_image(
@@ -13,6 +14,7 @@ class Coin(pygame.sprite.Sprite):
         self.hero = hero
 
     def update(self, *args):
+        """"Проверка положения игрока - собрал ли игрок монету"""
         if pygame.sprite.collide_mask(self, self.hero):
             self.hero.coins += 10
             pygame.mixer.Sound('./data/sounds/Coin.wav').play()

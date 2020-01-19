@@ -2,8 +2,10 @@ import pygame
 
 
 class Button:
+    """"Класс кнопки"""
     def create_button(self, surface, color, x, y, length, height,
                       width, text, text_color):
+        """Создание кнопки"""
         surface = self.draw_button(surface, color, length, height, x, y, width)
         surface = self.write_text(surface, text,
                                   text_color, length, height, x, y)
@@ -11,6 +13,7 @@ class Button:
         return surface
 
     def write_text(self, surface, text, text_color, length, height, x, y):
+        """Добавление текста на кнопку"""
         font_size = int(length // len(text))
         font = pygame.font.SysFont("Calibri", font_size)
         text = font.render(text, 1, text_color)
@@ -20,6 +23,7 @@ class Button:
         return surface
 
     def draw_button(self, surface, color, length, height, x, y, width):
+        """Отлрисовка кнопки"""
         for i in range(1, 10):
             s = pygame.Surface((length+(i * 2), height+(i * 2)))
             s.fill(color)
@@ -35,6 +39,7 @@ class Button:
         return surface
 
     def pressed(self, mouse):
+        """"Проверка, нажата ли кнопка"""
         if mouse[0] > self.rect.topleft[0]:
             if mouse[1] > self.rect.topleft[1]:
                 if mouse[0] < self.rect.bottomright[0]:

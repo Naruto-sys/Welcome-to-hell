@@ -1,4 +1,5 @@
 class Camera:
+    """Камера, сохраняющая героя на экране во время перемещения по полю"""
     def __init__(self, width, height, screen):
         self.width = width
         self.height = height
@@ -11,10 +12,12 @@ class Camera:
         self.screen = screen
 
     def apply(self, obj):
+        """Движение объектов на поле"""
         obj.rect.x += self.dx
         obj.rect.y += self.dy
 
     def update(self, target):
+        """"Сохранение игрока на поле с помощью проверки его положения"""
         if (target.rect.y + target.rect.h // 2 >= self.height // 2)\
                 and not self.flag_y:
             self.dy = -(target.rect.y + target.rect.h // 2 - self.height // 2)

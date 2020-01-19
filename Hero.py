@@ -7,9 +7,11 @@ clock = pygame.time.Clock()
 
 
 class Hero(pygame.sprite.Sprite):
+    """Класс главного героя игры"""
     def __init__(self, impassable_tiles_group):
         super().__init__()
 
+        # анимация игрока
         self.frames = [load_image("./mainHero/straight.png", color_key=-1),
                        load_image("./mainHero/right3.png", color_key=-1),
                        load_image("./mainHero/right2.png", color_key=-1),
@@ -38,6 +40,7 @@ class Hero(pygame.sprite.Sprite):
         self.damage = 100
 
     def update(self):
+        """Перемещение игрока по полю"""
         if self.moving:
             self.cur_frame = (self.cur_frame + 1) % len(self.frames)
             self.image = self.frames[self.cur_frame]
