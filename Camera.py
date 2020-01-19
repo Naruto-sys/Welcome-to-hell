@@ -1,8 +1,5 @@
-import pygame
-
-
 class Camera:
-    def __init__(self, width, height, screen, all_sprites):
+    def __init__(self, width, height, screen):
         self.width = width
         self.height = height
         self.dx = 0

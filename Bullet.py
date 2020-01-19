@@ -2,7 +2,7 @@ import pygame
 
 
 class Bullet(pygame.sprite.Sprite):
-    def __init__(self, image, damage, speed, start_pos, point_pos,
+    def __init__(self, image, damage, speed, start_pos, final_pos,
                  distance, walls, hero, enemies, bull_group=-1):
         super().__init__()
 
@@ -25,12 +25,12 @@ class Bullet(pygame.sprite.Sprite):
         self.mask = pygame.mask.from_surface(self.image)
 
         self.start_pos = start_pos
-        self.x = self.start_pos[0] - point_pos[0]
-        self.y = self.start_pos[1] - point_pos[1]
+        self.x = self.start_pos[0] - final_pos[0]
+        self.y = self.start_pos[1] - final_pos[1]
 
-        self.point_pos = point_pos
-        x1 = self.point_pos[0] - self.start_pos[0]
-        y1 = self.point_pos[1] - self.start_pos[1]
+        self.final_pos = final_pos
+        x1 = self.final_pos[0] - self.start_pos[0]
+        y1 = self.final_pos[1] - self.start_pos[1]
 
         if (x1 ** 2 + y1 ** 2) ** 0.5 < self.distance:
             while (x1 ** 2 + y1 ** 2) ** 0.5 < self.distance:
@@ -56,17 +56,21 @@ class Bullet(pygame.sprite.Sprite):
                                  (self.y // self.speed) ** 2) ** 0.5
         if self.passed_distance > self.distance:
             self.kill()
+
         if self.x < 0:
             if self.rect.x < self.x + self.start_pos[0]:
                 self.kill()
+
         if self.x > 0:
             if self.rect.x > self.x + self.start_pos[0]:
                 self.kill()
+
         if self.bull_group == -1:
             if pygame.sprite.collide_mask(self, self.hero):
                 pygame.mixer.Sound('./data/sounds/Hit.wav').play()
                 self.hero.hp -= 100
                 self.kill()
+
         for elem in self.walls:
             if pygame.sprite.collide_mask(self, elem):
                 if self.bull_group != -1:

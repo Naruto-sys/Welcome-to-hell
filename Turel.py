@@ -1,6 +1,6 @@
 from Bullet import Bullet
 from load_image import load_image
-from coin import Coin
+from Coin import Coin
 from rotate import rotate
 import pygame
 import math
@@ -52,9 +52,8 @@ class Turel(pygame.sprite.Sprite):
           
         self.shooting(self.hero, self.rect.x, self.rect.y)
 
-        mouse_x, mouse_y = self.hero.rect.x + self.hero.rect.w // 2, \
+        x, y = self.hero.rect.x + self.hero.rect.w // 2, \
                            self.hero.rect.y + + self.hero.rect.h // 2
-        rel_x, rel_y = mouse_x - self.rect.x, mouse_y - self.rect.y
+        rel_x, rel_y = x - self.rect.x, y - self.rect.y
         angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
         self.image, self.rect = rotate(self.frame, self.rect, int(angle))
-

@@ -1,5 +1,4 @@
 import pygame
-from load_image import load_image
 
 tile_width = tile_height = 50
 

@@ -9,7 +9,7 @@ clock = pygame.time.Clock()
 class Hero(pygame.sprite.Sprite):
     def __init__(self, impassable_tiles_group):
         super().__init__()
-        self.step = 10
+
         self.frames = [load_image("./mainHero/straight.png", color_key=-1),
                        load_image("./mainHero/right3.png", color_key=-1),
                        load_image("./mainHero/right2.png", color_key=-1),
@@ -19,15 +19,19 @@ class Hero(pygame.sprite.Sprite):
                        load_image("./mainHero/left2.png", color_key=-1),
                        load_image("./mainHero/left1.png", color_key=-1)]
         self.cur_frame = 0
+
         self.image = self.frames[self.cur_frame]
         self.mask = pygame.mask.from_surface(self.image)
         self.impassable_tiles_group = impassable_tiles_group
+
         self.moving = False
         self.motions = []
+
         self.rect = self.image.get_rect()
         self.rect.x = 100
         self.rect.y = 100
 
+        self.step = 10
         self.hp = 1000
         self.kills = 0
         self.coins = 0
@@ -37,7 +41,7 @@ class Hero(pygame.sprite.Sprite):
         if self.moving:
             self.cur_frame = (self.cur_frame + 1) % len(self.frames)
             self.image = self.frames[self.cur_frame]
-        if len(self.motions) == 0:
+        elif len(self.motions) == 0:
             self.cur_frame = 0
             self.moving = False
 
@@ -47,29 +51,32 @@ class Hero(pygame.sprite.Sprite):
         self.image, self.rect = rotate(self.frames[self.cur_frame],
                                        self.rect, int(angle))
 
-        for elem in self.motions:
-            if elem == 119:
+        for motion in self.motions:
+            if motion == 119:
                 self.rect.y -= self.step
-                for elem in self.impassable_tiles_group:
-                    if pygame.sprite.collide_mask(self, elem):
+                for tile in self.impassable_tiles_group:
+                    if pygame.sprite.collide_mask(self, tile):
                         self.rect.y += self.step
                         break
-            elif elem == 115:
+
+            elif motion == 115:
                 self.rect.y += self.step
-                for elem in self.impassable_tiles_group:
-                    if pygame.sprite.collide_mask(self, elem):
+                for tile in self.impassable_tiles_group:
+                    if pygame.sprite.collide_mask(self, tile):
                         self.rect.y -= self.step
                         break
-            elif elem == 97:
+
+            elif motion == 97:
                 self.rect.x -= self.step
-                for elem in self.impassable_tiles_group:
-                    if pygame.sprite.collide_mask(self, elem):
+                for tile in self.impassable_tiles_group:
+                    if pygame.sprite.collide_mask(self, tile):
                         self.rect.x += self.step
                         break
-            elif elem == 100:
+
+            elif motion == 100:
                 self.rect.x += self.step
-                for elem in self.impassable_tiles_group:
-                    if pygame.sprite.collide_mask(self, elem):
+                for tile in self.impassable_tiles_group:
+                    if pygame.sprite.collide_mask(self, tile):
                         self.rect.x -= self.step
                         break
         clock.tick(10)

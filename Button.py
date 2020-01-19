@@ -1,5 +1,4 @@
 import pygame
-pygame.init()
 
 
 class Button:
@@ -13,11 +12,11 @@ class Button:
 
     def write_text(self, surface, text, text_color, length, height, x, y):
         font_size = int(length // len(text))
-        myFont = pygame.font.SysFont("Calibri", font_size)
-        myText = myFont.render(text, 1, text_color)
-        surface.blit(myText, ((x + length / 2) - myText.get_width()
+        font = pygame.font.SysFont("Calibri", font_size)
+        text = font.render(text, 1, text_color)
+        surface.blit(text, ((x + length / 2) - text.get_width()
                               / 2, (y + height / 2) -
-                              myText.get_height() / 2))
+                              text.get_height() / 2))
         return surface
 
     def draw_button(self, surface, color, length, height, x, y, width):

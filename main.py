@@ -2,15 +2,15 @@ import os
 import sys
 import pygame
 import random
+from datetime import datetime
 from Button import Button
 from Hero import Hero
 from load_image import load_image
-from tiles import Tile
+from Tiles import Tile
 from Camera import Camera
 from Bullet import Bullet
 from Turel import Turel
-from datetime import datetime
-from coin import Coin
+from Coin import Coin
 
 pygame.init()
 FPS = 100
@@ -49,24 +49,18 @@ def load_level(filename):
 
 
 tile_images = {"#": load_image("./tiles/grey_floor.jpg"),
-               "*": load_image("./tiles/brown_floor.jpg"),
-               "&": load_image("./tiles/light_grey_floor.jpg"),
                "$": load_image("./tiles/warning_floor.jpg"),
                "~": load_image("./tiles/lava.jpg"),
                "|": load_image("./tiles/grey_rock_wall.jpg"),
-               "\\": load_image("./tiles/brown_rock_wall.jpg"),
-               "/": load_image("./tiles/brown_sugar_rock_wall.jpg"),
-               "+": pygame.transform.scale(load_image("./turels/Turel.png",
+               "+": pygame.transform.scale(load_image("./turels/turel.png",
                                                       -1),
-                                           (50, 50)),
-               "@": pygame.transform.scale(load_image("./tiles/coin.png", -1),
                                            (50, 50))}
 
 
 def generate_level(level):
     for y in range(len(level)):
         for x in range(len(level[y])):
-            if level[y][x] in "\\|/":
+            if level[y][x] == "|":
                 Tile(tile_images[level[y][x]], x, y, impassable_tiles_group,
                      tiles_group, all_sprites)
             elif level[y][x] == '$':
@@ -116,10 +110,10 @@ def start_screen():
                                HEIGHT // 2 - 75, 200, 50, 1, "Play",
                                (255, 0, 0))
 
-        rules_btn = Button()
-        rules_btn.create_button(screen, (10, 10, 10), WIDTH // 2 - 100,
-                                HEIGHT // 2, 200, 50, 1, "Rules",
-                                (255, 0, 0))
+        controls_btn = Button()
+        controls_btn.create_button(screen, (10, 10, 10), WIDTH // 2 - 100,
+                                   HEIGHT // 2, 200, 50, 1, "Controls",
+                                   (255, 0, 0))
 
         result_btn = Button()
         result_btn.create_button(screen, (10, 10, 10), WIDTH // 2 - 100,
@@ -135,7 +129,7 @@ def start_screen():
             if event.type == pygame.QUIT:
                 terminate()
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                if rules_btn.pressed(event.pos):
+                if controls_btn.pressed(event.pos):
                     pygame.mixer.Sound('./data/sounds/Select.wav').play()
                     rule_screen()
                 if exit_btn.pressed(event.pos):
@@ -152,12 +146,13 @@ def start_screen():
 
 def rule_screen():
     screen.fill((0, 0, 0))
-    rules = ["ЛКМ - Огонь",
-             "W - Вперёд",
-             "A - Влево",
-             "S - Назад",
-             "D - Вправо",
-             "E - Взаимодейтсвовать"]
+    controls = ["Left click - shoot",
+                "W - move up",
+                "A - move left",
+                "S - move down",
+                "D - move right",
+                "ESCAPE - pause",
+                "End of level - yellow-black floor"]
 
     fon = pygame.transform.scale(load_image('fons/rule_fon.jpg'),
                                  (WIDTH, HEIGHT))
@@ -169,7 +164,7 @@ def rule_screen():
 
     font = pygame.font.Font(None, 30)
     text_coord = HEIGHT // 2
-    for line in rules:
+    for line in controls:
         string_rendered = font.render(line, 1, pygame.Color(255, 100, 100))
         intro_rect = string_rendered.get_rect()
         text_coord += 10
@@ -195,7 +190,7 @@ def play_level():
     win_flag = False
     level = 1
 
-    hp = 1000
+    hp = 5000
     kills = 0
     coins = 0
     step = 10
@@ -216,7 +211,7 @@ def play_level():
         hero.kills = kills
         hero.step = step
         hero.damage = damage
-        camera = Camera(WIDTH, HEIGHT, screen, all_sprites)
+        camera = Camera(WIDTH, HEIGHT, screen)
 
         while True:
             for event in pygame.event.get():
@@ -225,21 +220,21 @@ def play_level():
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:
                         all_sprites.add(Bullet(load_image("./bullets/"
-                                                         "hero_bullet.png",
-                                                         -1), 10,
-                                              20, (hero.rect.x +
-                                                   hero.rect.w // 2,
-                                                   hero.rect.y +
-                                                   hero.rect.h // 2),
-                                              event.pos, 600,
-                                              impassable_tiles_group,
-                                              hero, enemies_tiles_group,
-                                              enemies_tiles_group))
+                                                          "hero_bullet.png",
+                                                          -1), 10,
+                                               20, (hero.rect.x +
+                                                    hero.rect.w // 2,
+                                                    hero.rect.y +
+                                                    hero.rect.h // 2),
+                                               event.pos, 600,
+                                               impassable_tiles_group,
+                                               hero, enemies_tiles_group,
+                                               enemies_tiles_group))
                         pygame.mixer.Sound('./data/sounds/Shoot.wav').play()
                 elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_w or \
-                            event.key == pygame.K_a or \
-                            event.key == pygame.K_s or \
+                    if event.key == pygame.K_w or\
+                            event.key == pygame.K_a or\
+                            event.key == pygame.K_s or\
                             event.key == pygame.K_d:
                         hero.moving = True
                         hero.motions.append(event.key)
@@ -283,7 +278,7 @@ def play_level():
                     and level == 3:
                 now = datetime.now()
                 score = hero.hp + hero.kills * 100 + hero.coins * 10
-                with open('./data/files/results.txt', 'a+', newline='') \
+                with open('./data/files/results.txt', 'a+', newline='')\
                         as file:
                     file.write(f"{score} {now}\n")
                     file.close()
@@ -300,10 +295,6 @@ def play_level():
             screen.fill((0, 0, 0))
             tiles_group.draw(screen)
             all_sprites.draw(screen)
-
-            hp = hero.hp
-            kills = hero.kills
-            coins = hero.coins
 
             hp_txt = pygame.font.Font(None, 50)
             text_hp = hp_txt.render(f"HP: {hero.hp}", 1, (255, 255, 255))
@@ -486,6 +477,7 @@ def shop_screen(hero):
                                 (255, 0, 0))
 
         font = pygame.font.SysFont('Calibri', 32)
+
         text = font.render("HELTH UP FOR", 1, (255, 0, 0))
         screen.blit(text, (WIDTH // 2 - 300, 450))
 
@@ -508,17 +500,17 @@ def shop_screen(hero):
                 elif health_btn.pressed(event.pos):
                     if hero.coins >= 10:
                         pygame.mixer.Sound('./data/sounds/Select.wav').play()
-                        hero.hp += 500
+                        hero.hp += 250
                         hero.coins -= 10
                 elif sword_btn.pressed(event.pos):
                     if hero.coins >= 10:
                         pygame.mixer.Sound('./data/sounds/Select.wav').play()
-                        hero.damage += 50
+                        hero.damage += 25
                         hero.coins -= 10
                 elif speed_btn.pressed(event.pos):
                     if hero.coins >= 10:
                         pygame.mixer.Sound('./data/sounds/Select.wav').play()
-                        hero.step += 1
+                        hero.step += 0.5
                         hero.coins -= 10
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
@@ -665,10 +657,9 @@ def results_screen():
             return
         data_sorted = data1[:-1].split('\n')
         ls = data_sorted[-1].split()
-        print(ls)
         data_sorted = [elem.split() for elem in data_sorted]
         last_result = ['Last result', f"Score: {ls[0]}  Date: {ls[1]} "
-                                      f"{':'.join(ls[2].split(':')[:2])}"]
+                       f"{':'.join(ls[2].split(':')[:2])}"]
         data_sorted.sort(key=lambda x: -int(x[0]))
         data = ['Best results:']
         for num, elem in enumerate(data_sorted):
