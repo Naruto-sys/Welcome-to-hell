@@ -5,24 +5,23 @@ from rotate import rotate
 import pygame, math
 
 
-
 class Turel(pygame.sprite.Sprite):
-    def __init__(self, start_pos, frame, walls, hero, all_sprites, bullets_group, enemies_group):
+    def __init__(self, pos_x, pos_y, frame, walls, hero, all_sprites, bullets_group, enemies_group):
         super().__init__()
         self.all_sprites = all_sprites
         self.walls = walls
         self.hero = hero
 
+        self.tile_width = 50
+        self.tile_height = 50
+        self.pos_x, self.pos_y = pos_x, pos_y
+
         self.frame = frame
         self.image = frame
         self.mask = pygame.mask.from_surface(self.image)
         self.enemies_group = enemies_group
-
-        self.start_pos = start_pos
-        self.rect = self.image.get_rect()
-
-        self.rect.x = start_pos[0]
-        self.rect.y = start_pos[1]
+        self.start_pos = [self.tile_width * pos_x, self.tile_height * pos_y]
+        self.rect = self.image.get_rect().move(self.tile_width * pos_x, self.tile_height * pos_y)
         self.bullets_group = bullets_group
 
         self.hp = 2000
@@ -75,12 +74,15 @@ class Turel(pygame.sprite.Sprite):
                 break
             if self.x < 0:
                 if self.rect.x < self.x + self.start_pos[0]:
-                    flag = False
                     break
             if self.x > 0:
                 if self.rect.x > self.x + self.start_pos[0]:
-                    flag = False
-                    break
+                    if self.y > 0:
+                        if self.rect.y > self.y + self.start_pos[1]:
+                            break
+                    if self.y < 0:
+                        if self.rect.y < self.y + self.start_pos[1]:
+                            break
             for elem in self.walls:
                 if pygame.sprite.collide_mask(self, elem) and elem not in self.enemies_group:
                     flag = False
@@ -96,7 +98,7 @@ class Turel(pygame.sprite.Sprite):
 
     def update(self, *args):
         if self.hp <= 0:
-            self.all_sprites.add(Coin((self.rect.x, self.rect.y), self.all_sprites, self.hero))
+            self.all_sprites.add(Coin(self.pos_x, self.pos_y, self.hero))
             self.kill()
             self.hero.kills += 1
             return

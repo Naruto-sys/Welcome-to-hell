@@ -9,6 +9,7 @@ from tiles import Tile
 from Camera import Camera
 from Bullet import Bullet
 from Turel import Turel
+from coin import Coin
 
 pygame.init()
 FPS = 100
@@ -60,11 +61,12 @@ tile_images = {"#": load_image("./tiles/grey_floor.jpg"),
                "~": load_image("./tiles/lava.jpg"),
                "|": load_image("./tiles/grey_rock_wall.jpg"),
                "\\": load_image("./tiles/brown_rock_wall.jpg"),
-               "/": load_image("./tiles/brown_sugar_rock_wall.jpg")}
+               "/": load_image("./tiles/brown_sugar_rock_wall.jpg"),
+               "+": pygame.transform.scale(load_image("./turels/Turel.png", -1), (50, 50)),
+               "@": pygame.transform.scale(load_image("./coin.png", -1), (50, 50))}
 
 
 def generate_level(level):
-    new_player, x, y = None, None, None
     for y in range(len(level)):
         for x in range(len(level[y])):
             if level[y][x] in "\\|/":
@@ -74,8 +76,20 @@ def generate_level(level):
             elif level[y][x] == '~':
                 Tile(tile_images[level[y][x]], x, y, lava_tiles_group, tiles_group, all_sprites)
             else:
-                Tile(tile_images[level[y][x]], x, y, tiles_group, all_sprites)
-    return new_player, x, y
+                Tile(tile_images["#"], x, y, tiles_group, all_sprites)
+    hero = Player(impassable_tiles_group)
+    for y in range(len(level)):
+        for x in range(len(level[y])):
+            if level[y][x] == "+":
+                enemy = Turel(x, y, tile_images[level[y][x]],
+                              impassable_tiles_group, hero, all_sprites, -1, enemies_tiles_group)
+                impassable_tiles_group.add(enemy)
+                enemies_tiles_group.add(enemy)
+                all_sprites.add(enemy)
+            if level[y][x] == "@":
+                coin = Coin(x, y, hero)
+                all_sprites.add(coin)
+    return hero
 
 
 def start_screen():
@@ -170,16 +184,10 @@ def play_level():
         pygame.mixer.music.load("./data/sounds/Paris.mp3")
         pygame.mixer.music.play(loops=-1)
         pygame.mixer.music.set_volume(0.9)
-
-        hero = Player(impassable_tiles_group)
-        enemy = Turel((400, 500), load_image("./turels/Turel.png", -1), impassable_tiles_group, hero, all_sprites, -1, enemies_tiles_group)
-        impassable_tiles_group.add(enemy)
-        enemies_tiles_group.add(enemy)
-
         a = load_level(f"./levels/level{level}.txt")
         camera = Camera(WIDTH, HEIGHT, screen, all_sprites)
-        generate_level(a)
-        all_sprites.add(hero, enemy)
+        hero = generate_level(a)
+        all_sprites.add(hero)
 
         while True:
             for event in pygame.event.get():
