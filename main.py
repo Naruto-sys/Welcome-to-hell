@@ -176,7 +176,7 @@ def rule_screen():
 def play_level():
     win_flag = False
     level = 1
-    hp = 100000
+    hp = 10000
     kills = 0
     coins = 0
     while not win_flag:
@@ -325,8 +325,48 @@ def play_level():
                                                        text_coins_h + 20),
                              3)
 
+            if hero.hp < 0:
+                dead_screen()
+
             pygame.display.flip()
             clock.tick(20)
+
+
+def dead_screen():
+    screen.fill((0, 0, 0))
+
+    fon = pygame.transform.scale(load_image('fons/warning_picture.png'),
+                                 (WIDTH, HEIGHT))
+    screen.blit(fon, (0, 0))
+
+    menu_btn = Button()
+    menu_btn.create_button(screen, (10, 10, 10), WIDTH // 2 - 100,
+                           HEIGHT // 3 * 2, 200, 50, 1, "Back", (255, 0, 0))
+
+    font = pygame.font.Font(None, 90)
+    text = font.render(f"You died!", 1, (0, 0, 0))
+    text_x = WIDTH // 2 - text.get_width() // 2
+    text_y = HEIGHT // 4 - text.get_height() // 2
+    text_w = text.get_width()
+    text_h = text.get_height()
+    screen.blit(text, (text_x, text_y))
+    pygame.draw.rect(screen, (0, 0, 0), (text_x - 10,
+                                         text_y - 10,
+                                         text_w + 20,
+                                         text_h + 20),
+                     3)
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if menu_btn.pressed(event.pos):
+                    pygame.mixer.Sound('./data/sounds/Select.wav').play()
+                    return start_screen()
+
+        pygame.display.flip()
+        clock.tick(FPS)
 
 
 def pause():
@@ -571,4 +611,4 @@ def results_screen():
 
 if __name__ == '__main__':
     while True:
-        congratulations_screen()
+        start_screen()
