@@ -6,7 +6,7 @@ import math
 clock = pygame.time.Clock()
 
 
-class Player(pygame.sprite.Sprite):
+class Hero(pygame.sprite.Sprite):
     def __init__(self, impassable_tiles_group):
         super().__init__()
         self.step = 10
@@ -28,7 +28,7 @@ class Player(pygame.sprite.Sprite):
         self.rect.x = 100
         self.rect.y = 100
 
-        self.hp = 10000
+        self.hp = 1000
         self.kills = 0
         self.coins = 0
         self.damage = 100

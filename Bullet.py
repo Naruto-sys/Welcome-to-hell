@@ -73,7 +73,7 @@ class Bullet(pygame.sprite.Sprite):
                     if elem in self.bull_group:
                         pygame.mixer.Sound('./data/sounds/Hit.wav').play()
                         elem.hp -= self.hero.damage
-                        self.kill()
+                    self.kill()
                 else:
                     if elem not in self.enemies:
                         self.kill()

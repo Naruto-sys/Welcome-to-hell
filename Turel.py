@@ -7,8 +7,7 @@ import math
 
 
 class Turel(pygame.sprite.Sprite):
-    def __init__(self, start_pos, frame, walls, hero, all_sprites,
-                 bullets_group, enemies_group):
+    def __init__(self, pos_x, pos_y, frame, walls, hero, all_sprites, bullets_group, enemies_group):
         super().__init__()
         self.all_sprites = all_sprites
         self.walls = walls

@@ -3,7 +3,7 @@ import sys
 import pygame
 import random
 from Button import Button
-from Hero import Player
+from Hero import Hero
 from load_image import load_image
 from tiles import Tile
 from Camera import Camera
@@ -73,7 +73,7 @@ def generate_level(level):
                      tiles_group, all_sprites)
             else:
                 Tile(tile_images["#"], x, y, tiles_group, all_sprites)
-    hero = Player(impassable_tiles_group)
+    hero = Hero(impassable_tiles_group)
     for y in range(len(level)):
         for x in range(len(level[y])):
             if level[y][x] == "+":
@@ -191,27 +191,28 @@ def play_level():
     win_flag = False
     level = 1
 
-    hp = 10000
+    hp = 1000
     kills = 0
     coins = 0
+    step = 10
+    damage = 100
+
     while not win_flag:
         screen.fill((0, 0, 0))
 
         pygame.mixer.music.load("./data/sounds/Paris.mp3")
         pygame.mixer.music.play(loops=-1)
         pygame.mixer.music.set_volume(0.9)
-
+        a = load_level(f"./levels/level{level}.txt")
         hero = generate_level(a)
         all_sprites.add(hero)
-        
+
         hero.hp = hp
         hero.coins = coins
         hero.kills = kills
-
-        a = load_level(f"./levels/level{level}.txt")
+        hero.step = step
+        hero.damage = damage
         camera = Camera(WIDTH, HEIGHT, screen, all_sprites)
-        generate_level(a)
-        all_sprites.add(hero, enemy)
 
         while True:
             for event in pygame.event.get():
@@ -222,7 +223,7 @@ def play_level():
                        all_sprites.add(Bullet(load_image("./bullets/hero_bullet.png", -1), 10,
                                                20, (hero.rect.x + hero.rect.w // 2, hero.rect.y + hero.rect.h // 2),
                                                event.pos, 600, impassable_tiles_group, hero, enemies_tiles_group, enemies_tiles_group))
-                        pygame.mixer.Sound('./data/sounds/Shoot.wav').play()
+                       pygame.mixer.Sound('./data/sounds/Shoot.wav').play()
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_w or \
                             event.key == pygame.K_a or \
@@ -251,6 +252,11 @@ def play_level():
             if pygame.sprite.spritecollideany(hero, warring_tiles_group)\
                     and level != 3:
                 flag = start_new_level_screen()
+                hp = hero.hp
+                damage = hero.damage
+                step = hero.step
+                kills = hero.kills
+                coins = hero.coins
                 if flag:
                     for elem in all_sprites:
                         elem.kill()
@@ -327,7 +333,10 @@ def play_level():
                              3)
 
             if hero.hp < 0:
+                for elem in all_sprites:
+                    elem.kill()
                 dead_screen()
+                return
 
             pygame.display.flip()
             clock.tick(20)
@@ -364,7 +373,7 @@ def dead_screen():
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if menu_btn.pressed(event.pos):
                     pygame.mixer.Sound('./data/sounds/Select.wav').play()
-                    return start_screen()
+                    return
 
         pygame.display.flip()
         clock.tick(FPS)
@@ -624,12 +633,12 @@ def results_screen():
             return
         data_sorted = data1[1:-1].split('\n')
         ls = data_sorted[-1].split()
+        data_sorted = [elem.split() for elem in data_sorted]
         last_result = ['Last result', f"Score: {ls[0]}  Date: {ls[1]} "
                                       f"{':'.join(ls[2].split(':')[:2])}"]
         data_sorted.sort(key=lambda x: -int(x[0]))
         data = ['Best results:']
         for num, elem in enumerate(data_sorted):
-            elem = elem.split()
             data.append(f"{num + 1}) Score: {elem[0]}  Date: {elem[1]} "
                         f"{':'.join(elem[2].split(':')[:2])}")
 
@@ -675,7 +684,6 @@ def results_screen():
                     start_screen()
             elif event.type == pygame.QUIT:
                 terminate()
-
         pygame.display.flip()
         clock.tick(FPS)
 
