@@ -70,7 +70,7 @@ class Bullet(pygame.sprite.Sprite):
             if pygame.sprite.collide_mask(self, elem):
                 if self.bull_group != -1:
                     if elem in self.bull_group:
-                        elem.hp -= 100
+                        elem.hp -= self.hero.damage
                         pygame.mixer.Sound('./data/sounds/Hit.wav').play()
                     self.kill()
                 else:

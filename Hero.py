@@ -31,6 +31,7 @@ class Player(pygame.sprite.Sprite):
         self.hp = 10000
         self.kills = 0
         self.coins = 0
+        self.damage = 100
 
     def update(self):
         if self.moving:

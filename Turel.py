@@ -31,7 +31,7 @@ class Turel(pygame.sprite.Sprite):
         if self.distance > 300:
             flag = False
         if flag:
-            self.all_sprites.add(Bullet(load_image("./bullets/bullet.png", -1),
+            self.all_sprites.add(Bullet(load_image("./bullets/enemy_bullet.png", -1),
                                         20, 20, (self.rect.x + self.rect.w // 2, self.rect.y + self.rect.h // 2),
                                         (self.hero.rect.x + self.hero.rect.w // 2,
                                          self.hero.rect.y + self.hero.rect.h // 2),
