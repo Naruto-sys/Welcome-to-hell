@@ -6,7 +6,7 @@ class Coin(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y, hero):
         super().__init__()
         self.image = pygame.transform.scale(load_image(
-            "./tiles/coin.png", -1), (50, 50))
+            "./tiles/coin.jpg", -1), (50, 50))
         self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = pos_x * 50, pos_y * 50
