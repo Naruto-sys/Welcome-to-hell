@@ -11,9 +11,11 @@ class Coin(pygame.sprite.Sprite):
         self.mask = pygame.mask.from_surface(self.image)
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = start_pos
+
         self.hero = hero
 
     def update(self, *args):
         if pygame.sprite.collide_mask(self, self.hero):
+            pygame.mixer.Sound('./data/sounds/Coin.wav').play()
             self.hero.coins += 10
             self.kill()

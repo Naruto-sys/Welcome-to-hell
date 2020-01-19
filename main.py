@@ -10,6 +10,7 @@ from Camera import Camera
 from Bullet import Bullet
 from Turel import Turel
 from datetime import datetime
+from coin import Coin
 
 pygame.init()
 FPS = 100
@@ -28,7 +29,6 @@ lava_tiles_group = pygame.sprite.Group()
 enemies_tiles_group = pygame.sprite.Group()
 enemies_bullets_tiles_group = pygame.sprite.Group()
 heroes_tiles_group = pygame.sprite.Group()
-
 
 def terminate():
     pygame.quit()
@@ -54,11 +54,12 @@ tile_images = {"#": load_image("./tiles/grey_floor.jpg"),
                "~": load_image("./tiles/lava.jpg"),
                "|": load_image("./tiles/grey_rock_wall.jpg"),
                "\\": load_image("./tiles/brown_rock_wall.jpg"),
-               "/": load_image("./tiles/brown_sugar_rock_wall.jpg")}
+               "/": load_image("./tiles/brown_sugar_rock_wall.jpg"),
+               "+": pygame.transform.scale(load_image("./turels/Turel.png", -1), (50, 50)),
+               "@": pygame.transform.scale(load_image("./tiles/coin.png", -1), (50, 50))}
 
 
 def generate_level(level):
-    new_player, x, y = None, None, None
     for y in range(len(level)):
         for x in range(len(level[y])):
             if level[y][x] in "\\|/":
@@ -71,8 +72,21 @@ def generate_level(level):
                 Tile(tile_images[level[y][x]], x, y, lava_tiles_group,
                      tiles_group, all_sprites)
             else:
-                Tile(tile_images[level[y][x]], x, y, tiles_group, all_sprites)
-    return new_player, x, y
+                Tile(tile_images["#"], x, y, tiles_group, all_sprites)
+    hero = Player(impassable_tiles_group)
+    for y in range(len(level)):
+        for x in range(len(level[y])):
+            if level[y][x] == "+":
+                enemy = Turel(x, y, tile_images[level[y][x]],
+                              impassable_tiles_group, hero, all_sprites,
+                              -1, enemies_tiles_group)
+                impassable_tiles_group.add(enemy)
+                enemies_tiles_group.add(enemy)
+                all_sprites.add(enemy)
+            if level[y][x] == "@":
+                coin = Coin(x, y, hero)
+                all_sprites.add(coin)
+    return hero
 
 
 def start_screen():
@@ -176,6 +190,7 @@ def rule_screen():
 def play_level():
     win_flag = False
     level = 1
+
     hp = 10000
     kills = 0
     coins = 0
@@ -186,16 +201,12 @@ def play_level():
         pygame.mixer.music.play(loops=-1)
         pygame.mixer.music.set_volume(0.9)
 
-        hero = Player(impassable_tiles_group)
+        hero = generate_level(a)
+        all_sprites.add(hero)
+        
         hero.hp = hp
         hero.coins = coins
         hero.kills = kills
-
-        enemy = Turel((400, 500), load_image("./turels/Turel.png", -1),
-                      impassable_tiles_group, hero, all_sprites, -1,
-                      enemies_tiles_group)
-        impassable_tiles_group.add(enemy)
-        enemies_tiles_group.add(enemy)
 
         a = load_level(f"./levels/level{level}.txt")
         camera = Camera(WIDTH, HEIGHT, screen, all_sprites)
@@ -208,20 +219,10 @@ def play_level():
                     terminate()
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:
-                        all_sprites.add(Bullet(load_image
-                                               ("./bullets/bullet.png",
-                                                -1),
-                                               10, 20, (hero.rect.x +
-                                                        hero.rect.w // 2,
-                                                        hero.rect.y +
-                                                        hero.rect.h // 2),
-                                               event.pos, 600,
-                                               impassable_tiles_group,
-                                               hero, enemies_tiles_group,
-                                               enemies_tiles_group))
+                       all_sprites.add(Bullet(load_image("./bullets/hero_bullet.png", -1), 10,
+                                               20, (hero.rect.x + hero.rect.w // 2, hero.rect.y + hero.rect.h // 2),
+                                               event.pos, 600, impassable_tiles_group, hero, enemies_tiles_group, enemies_tiles_group))
                         pygame.mixer.Sound('./data/sounds/Shoot.wav').play()
-                    if event.button == 3:
-                        pass
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_w or \
                             event.key == pygame.K_a or \
@@ -233,7 +234,7 @@ def play_level():
                         hero.motions = []
                         hero.moving = False
                         hero.cur_frame = 0
-                        flag = pause()
+                        flag = pause(hero)
                         if flag == 1:
                             for elem in all_sprites:
                                 elem.kill()
@@ -369,29 +370,25 @@ def dead_screen():
         clock.tick(FPS)
 
 
-def pause():
+def pause(hero):
     pygame.mixer.music.set_volume(0.2)
     running = True
     while running:
         screen.fill((0, 0, 0))
-        fon = pygame.transform.scale(load_image('fons/hell.jpg'),
-                                     (WIDTH, HEIGHT))
+        fon = pygame.transform.scale(load_image('fons/hell.jpg'), (WIDTH, HEIGHT))
         screen.blit(fon, (0, 0))
 
         back_btn = Button()
-        back_btn.create_button(screen, (10, 10, 10), WIDTH // 3,
-                               HEIGHT // 4 - 50, 200, 50, 1, "Resume",
-                               (255, 0, 0))
+        back_btn.create_button(screen, (10, 10, 10), WIDTH // 3, HEIGHT // 6 - 50, 200, 50, 1, "Resume", (255, 0, 0))
 
         menu_btn = Button()
-        menu_btn.create_button(screen, (10, 10, 10), WIDTH // 3,
-                               HEIGHT // 4 * 2 - 50, 200, 50, 1, "Menu",
-                               (255, 0, 0))
+        menu_btn.create_button(screen, (10, 10, 10), WIDTH // 3, HEIGHT // 6 * 2 - 50, 200, 50, 1, "Menu", (255, 0, 0))
+
+        shop_btn = Button()
+        shop_btn.create_button(screen, (10, 10, 10), WIDTH // 3, HEIGHT // 6 * 3 - 50, 200, 50, 1, "Shop", (255, 0, 0))
 
         exit_btn = Button()
-        exit_btn.create_button(screen, (10, 10, 10), WIDTH // 3,
-                               HEIGHT // 4 * 3 - 50, 200, 50, 1, "Exit",
-                               (255, 0, 0))
+        exit_btn.create_button(screen, (10, 10, 10), WIDTH // 3, HEIGHT // 6 * 4 - 50, 200, 50, 1, "Exit", (255, 0, 0))
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -409,10 +406,82 @@ def pause():
                         pygame.mixer.music.set_volume(0.2)
                 elif exit_btn.pressed(event.pos):
                     terminate()
+                elif shop_btn.pressed(event.pos):
+                    shop_screen(hero)
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     return
 
+        pygame.display.flip()
+        clock.tick(FPS)
+
+
+def shop_screen(hero):
+    pygame.mixer.music.set_volume(0.3)
+    running = True
+    while running:
+        fon = pygame.transform.scale(load_image('./fons/shop_fon.jpg'), (WIDTH, HEIGHT))
+        screen.blit(fon, (0, 0))
+
+        helth_img = pygame.transform.scale(load_image('./shop/heart.jpg', -1), (200, 200))
+        screen.blit(helth_img, (WIDTH // 2 - 300, 200))
+
+        sword_img = pygame.transform.scale(load_image('./shop/sword.png', -1), (200, 200))
+        screen.blit(sword_img, (WIDTH // 2, 200))
+
+        boot_img = pygame.transform.scale(load_image('./shop/boot.png', -1), (200, 200))
+        screen.blit(boot_img, (WIDTH // 2 + 300, 200))
+
+        back_btn = Button()
+        back_btn.create_button(screen, (10, 10, 10), 50, HEIGHT - 300, 200, 75, 1, "BACK", (255, 0, 0))
+
+        health_btn = Button()
+        health_btn.create_button(screen, (10, 10, 10), WIDTH // 2 - 300, 500, 200, 75, 1, "10 COINS", (255, 0, 0))
+
+        sword_btn = Button()
+        sword_btn.create_button(screen, (10, 10, 10), WIDTH // 2, 500, 200, 75, 1, "10 COINS", (255, 0, 0))
+
+        speed_btn = Button()
+        speed_btn.create_button(screen, (10, 10, 10), WIDTH // 2 + 300, 500, 200, 75, 1, "10 COINS", (255, 0, 0))
+
+        font = pygame.font.SysFont('Calibri', 32)
+        text = font.render("HELTH UP FOR", 1, (255, 0, 0))
+        screen.blit(text, (WIDTH // 2 - 300, 450))
+
+        text = font.render("DAMAGE UP FOR", 1, (255, 0, 0))
+        screen.blit(text, (WIDTH // 2 - 10, 450))
+
+        text = font.render("SPEED UP FOR", 1, (255, 0, 0))
+        screen.blit(text, (WIDTH // 2 + 300, 450))
+
+        text = font.render("COINS: " + str(hero.coins), 1, (255, 0, 0))
+        screen.blit(text, (WIDTH - 200, 100))
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if back_btn.pressed(event.pos):
+                    pygame.mixer.Sound('./data/sounds/Select.wav').play()
+                    return
+                elif health_btn.pressed(event.pos):
+                    if hero.coins >= 10:
+                        pygame.mixer.Sound('./data/sounds/Select.wav').play()
+                        hero.hp += 500
+                        hero.coins -= 10
+                elif sword_btn.pressed(event.pos):
+                    if hero.coins >= 10:
+                        pygame.mixer.Sound('./data/sounds/Select.wav').play()
+                        hero.damage += 50
+                        hero.coins -= 10
+                elif speed_btn.pressed(event.pos):
+                    if hero.coins >= 10:
+                        pygame.mixer.Sound('./data/sounds/Select.wav').play()
+                        hero.step += 1
+                        hero.coins -= 10
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    return
         pygame.display.flip()
         clock.tick(FPS)
 
@@ -431,6 +500,7 @@ def warning_screen():
         screen.blit(text, (WIDTH // 10, HEIGHT // 4))
 
         back_btn = Button()
+
         back_btn.create_button(screen, (10, 10, 10), WIDTH // 4,
                                HEIGHT // 2 + 150, 200, 75, 1, "BACK",
                                (255, 0, 0))
@@ -461,6 +531,7 @@ def start_new_level_screen():
     pygame.mixer.music.set_volume(1)
     running = True
     while running:
+
         fon = pygame.transform.scale(load_image('fons/warning_picture.png'),
                                      (WIDTH, HEIGHT))
         screen.blit(fon, (0, 0))
@@ -612,3 +683,4 @@ def results_screen():
 if __name__ == '__main__':
     while True:
         start_screen()
+

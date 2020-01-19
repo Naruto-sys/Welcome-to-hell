@@ -31,11 +31,15 @@ class Player(pygame.sprite.Sprite):
         self.hp = 10000
         self.kills = 0
         self.coins = 0
+        self.damage = 100
 
     def update(self):
         if self.moving:
             self.cur_frame = (self.cur_frame + 1) % len(self.frames)
             self.image = self.frames[self.cur_frame]
+        if len(self.motions) == 0:
+            self.cur_frame = 0
+            self.moving = False
 
         mouse_x, mouse_y = pygame.mouse.get_pos()
         rel_x, rel_y = mouse_x - self.rect.x, mouse_y - self.rect.y
