@@ -63,7 +63,7 @@ tile_images = {"#": load_image("./tiles/grey_floor.jpg"),
                "\\": load_image("./tiles/brown_rock_wall.jpg"),
                "/": load_image("./tiles/brown_sugar_rock_wall.jpg"),
                "+": pygame.transform.scale(load_image("./turels/Turel.png", -1), (50, 50)),
-               "@": pygame.transform.scale(load_image("./coin.png", -1), (50, 50))}
+               "@": pygame.transform.scale(load_image("./tiles/coin.png", -1), (50, 50))}
 
 
 def generate_level(level):
