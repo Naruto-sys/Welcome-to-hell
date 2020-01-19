@@ -40,7 +40,8 @@ class Player(pygame.sprite.Sprite):
         mouse_x, mouse_y = pygame.mouse.get_pos()
         rel_x, rel_y = mouse_x - self.rect.x, mouse_y - self.rect.y
         angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
-        self.image, self.rect = rotate(self.frames[self.cur_frame], self.rect, int(angle))
+        self.image, self.rect = rotate(self.frames[self.cur_frame],
+                                       self.rect, int(angle))
 
         for elem in self.motions:
             if elem == 119:

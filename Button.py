@@ -3,9 +3,11 @@ pygame.init()
 
 
 class Button:
-    def create_button(self, surface, color, x, y, length, height, width, text, text_color):
+    def create_button(self, surface, color, x, y, length, height,
+                      width, text, text_color):
         surface = self.draw_button(surface, color, length, height, x, y, width)
-        surface = self.write_text(surface, text, text_color, length, height, x, y)
+        surface = self.write_text(surface, text,
+                                  text_color, length, height, x, y)
         self.rect = pygame.Rect(x, y, length, height)
         return surface
 
@@ -13,7 +15,8 @@ class Button:
         font_size = int(length // len(text))
         myFont = pygame.font.SysFont("Calibri", font_size)
         myText = myFont.render(text, 1, text_color)
-        surface.blit(myText, ((x + length / 2) - myText.get_width() / 2, (y + height / 2) -
+        surface.blit(myText, ((x + length / 2) - myText.get_width()
+                              / 2, (y + height / 2) -
                               myText.get_height() / 2))
         return surface
 
@@ -25,7 +28,8 @@ class Button:
             if alpha <= 0:
                 alpha = 1
             s.set_alpha(alpha)
-            pygame.draw.rect(s, color, (x - i, y - i, length + i, height + i), width)
+            pygame.draw.rect(s, color, (x - i, y - i, length + i,
+                                        height + i), width)
             surface.blit(s, (x - i, y - i))
         pygame.draw.rect(surface, color, (x, y, length, height), 0)
         pygame.draw.rect(surface, (190, 190, 190), (x, y, length, height), 1)
