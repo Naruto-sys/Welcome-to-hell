@@ -17,6 +17,7 @@ FPS = 100
 WIDTH = 1200
 HEIGHT = 650
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption('Welcome to hell')
 
 clock = pygame.time.Clock()
 
