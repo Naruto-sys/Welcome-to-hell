@@ -17,9 +17,9 @@ class Button:
         font_size = int(length // len(text))
         font = pygame.font.SysFont("Calibri", font_size)
         text = font.render(text, 1, text_color)
-        surface.blit(text, ((x + length / 2) - text.get_width()
-                              / 2, (y + height / 2) -
-                              text.get_height() / 2))
+        surface.blit(text, ((x + length / 2) -
+                            text.get_width() / 2, (y + height / 2) -
+                            text.get_height() / 2))
         return surface
 
     def draw_button(self, surface, color, length, height, x, y, width):
